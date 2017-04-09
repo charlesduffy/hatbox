@@ -54,11 +54,8 @@ const (
 // the methods Lex(*<prefix>SymType) int and Error(string).
 type exprLex struct {
         line string                     //Buffer containing SQL input text to be lexed
-        stack string                    //Token character stack
-        c rune				//"current" character
-        qs int                          //quoting state
-        ws bool                         //whitespace state
-        eat bool                        //"eat quote" flag
+	tokstart int			//start of current token
+	tokend int			//end of current token 
 }
 
 func (x *exprLex) popbuf() bool {
@@ -145,54 +142,26 @@ func (x *exprLex) Lex(yylval *exprSymType) int {
 
         var rune p
 
-        //start point
+	//This is called either at the very beginning of the 
+	//string to be parsed or at the start of a new 
+	//token
+
         start:
 
-        //pop char from  input buffer
-        if (x.popbuf() == false) {
-                return eof
-        }
+	switch next {
 
-        //if eat_quote is true, do not push the char to the stack
-        x.pushstack()
+	space:
+		x.ignore
+	dquote:
+		x.lexdquote()
+	squote:
+		x.lexsquote()
+	alphanum:
+		x.lex
+	number:
 
+	}
 
-        p = x.peek()
-
-        // if we are in a quoted state and the peek-ahead character is not a matching end-quote
-        // keep pushing characters on to the stack.
-        // consider introducing a token-length parameter here
-        for (x.qs != unquoted && x.matchQuote(p) == false) {
-                x.popbuf()
-                x.pushstack()
-                p = x.peek()
-        }
-
-        // if we are in a quoted state and the peek-ahead character is a matching end-quote go to z.
-        // Note we do not push the quote to the stack
-
-        if (x.qs != unquoted && x.matchQuote(p) == true) {
-                tc = x.matchTok(yylval)
-                return tc
-        }
-
-        // if we are in an unquoted state and the peek-ahead character is a quote, enter the relevant quoted state (identifier or string).
-        // Set eat_quote to true. Go to z.
-        //fix the bug in the logic around "eat" here
-        if (x.qs == unquoted && x.matchQuote(p) != notquote) {
-                x.qs = x.matchQuote(p)
-                x.eat = true
-                tc = x.matchTok(yylval)
-                return tc
-        }
-
-        //if we are in unquoted state and whitespace_class of the peek-ahead character does not
-        //equal the current ws_state, set ws_state to the whitespace_class of the peek-ahead character and go to z.
-        if (x.qs == unquoted && x.matchWs(p) != x.sw) {
-                x.ws = x.matchWs(p)
-                tc = x.matchTok(yylval)
-                return tc
-        }
 
 
         goto start

@@ -1,8 +1,42 @@
 Lexical Analyser
 ================
 
-Lexer flowchart
----------------
+Lexer token types:
+------------------
+
+IDENTIFIER
+
+STRING
+
+NUMERIC
+
+OPERATOR
+
+
+Lexer flowchart - functional version
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Order of token class lex attempts:
+
+acceptKeyword() - tries to match against SQL keyword
+	
+	* acceptRun() on aA-zZ, at end then try to match case
+
+* functional pseudocode
+
+
+
+	lexText()
+
+
+	  //try to lex keyword
+
+
+
+
+
+Lexer flowchart - stateful version
+----------------------------------
 
 a. set quoted state = false
 
@@ -34,6 +68,10 @@ z. Pop the contents of the stack into a variable tok.
 y. If quoted != false, set class to STRING
    Attempt to match the contents of tok to a token class.
    Return the token class and yylval (or error if the token cannot be matched). Go to 1.
+
+
+
+
 
 
 Other notes
