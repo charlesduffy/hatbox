@@ -14,15 +14,12 @@ package main
 
 %union 
 {
-	int			integer_val;
-	char 			*text_val;
-	float  			float_val;
-	char			*keyword;
-	char    		*identifier_val;
-
-	s_expr			*sExpr;	
-	tuple			*Tuple;
-}	
+integer_val	int
+text_val	string
+float_val	string
+keyword_val	string
+identifier_val	string
+}
 
 /*
 
