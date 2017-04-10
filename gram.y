@@ -112,43 +112,45 @@ package main
 sql:
     query_statement SEMICOLON
     {
+/*
 	$$ = ptree;
 	$$->type = v_tuple;
 	$$->v_tuple = $1;
 	$$->tag = "query";
 	$$->list.next = NULL;	
 	$$->list.prev = NULL;	
+*/
     }
     |
     sql query_statement SEMICOLON
     {
-	tuple_append(ptree , v_tuple, "query", $2);
+//	tuple_append(ptree , v_tuple, "query", $2);
     }
 ;
 
 query_statement:
     select_statement 
     { 
-	new_tuple($$, v_text, "statement_type", "select_statement");
-	tuple_append($$, v_tuple, "select_statement", $1);
+//	new_tuple($$, v_text, "statement_type", "select_statement");
+//	tuple_append($$, v_tuple, "select_statement", $1);
     } 
     |
     insert_statement	
     { 
-	new_tuple($$, v_text, "statement_type", "insert_statement");
-	tuple_append($$, v_tuple, "insert_statement", $1);
+//	new_tuple($$, v_text, "statement_type", "insert_statement");
+//	tuple_append($$, v_tuple, "insert_statement", $1);
     } 
     |
     create_table_stmt
     {
-	new_tuple($$, v_text, "statement_type", "create_table_statement");
-	tuple_append($$, v_tuple, "create_table_statement", $1);
+//	new_tuple($$, v_text, "statement_type", "create_table_statement");
+//	tuple_append($$, v_tuple, "create_table_statement", $1);
     }
     |
     drop_table_stmt
     {
-	new_tuple($$, v_text, "statement_type", "drop_table_statement");
-	tuple_append($$, v_tuple, "drop_table_statement", $1);
+//	new_tuple($$, v_text, "statement_type", "drop_table_statement");
+//	tuple_append($$, v_tuple, "drop_table_statement", $1);
     }
 ;
 
@@ -197,215 +199,215 @@ insert_value_list:
 select_list:
     select_list_item
     {
-	new_tuple($$, v_tuple, "select_list_item", $1);
+//	new_tuple($$, v_tuple, "select_list_item", $1);
     }
     |
     select_list COMMA select_list_item
     { 
-	tuple_append($$,v_tuple, "select_list_item", $3);
+//	tuple_append($$,v_tuple, "select_list_item", $3);
     } 
 ;
 
 select_list_item:
     u_select_list_item
     {
-	$$=$1;
+//	$$=$1;
     }
     |
     u_select_list_item AS IDENTIFIER
     {
-	$$=$1;
-	tuple_append($$, v_text, "alias", $3); 
+//	$$=$1;
+//	tuple_append($$, v_text, "alias", $3); 
     }
 ;
 
 u_select_list_item:
     scalar_expr
     {
-	new_tuple($$, v_sexpr, "value", $1);	
+//	new_tuple($$, v_sexpr, "value", $1);	
     }
     |
     MUL
     {
-	new_tuple($$, v_text, "value", "wildcard");
+//	new_tuple($$, v_text, "value", "wildcard");
     }	 
     |
     LPAREN select_statement RPAREN
     {
-	new_tuple($$, v_tuple, "subquery", $2);
+//	new_tuple($$, v_tuple, "subquery", $2);
     }
 ;
 
 select_statement:
     SELECT select_list table_expr
     {
-	new_tuple($$, v_tuple, "select_list", $2);
-	tuple_append($$, v_tuple, "table_expr", $3);
+//	new_tuple($$, v_tuple, "select_list", $2);
+//	tuple_append($$, v_tuple, "table_expr", $3);
     }
 ;
 
 table_ref:
     IDENTIFIER
     {
-	new_tuple($$, v_text, "name", $1);
+//	new_tuple($$, v_text, "name", $1);
     }
     |
     IDENTIFIER IDENTIFIER
     {
-	new_tuple($$, v_text, "name", $1);
-	tuple_append($$, v_text, "alias", $2);
+//	new_tuple($$, v_text, "name", $1);
+//	tuple_append($$, v_text, "alias", $2);
     }
     |
     IDENTIFIER AS IDENTIFIER
     {
-	new_tuple($$, v_text, "name", $1);
-	tuple_append($$, v_text, "alias", $3);
+//	new_tuple($$, v_text, "name", $1);
+//	tuple_append($$, v_text, "alias", $3);
     }
     |
     LPAREN select_statement RPAREN
     {
-	new_tuple($$, v_text, "name", "subquery");
-	tuple_append($$, v_tuple, "subquery", $2);
+//	new_tuple($$, v_text, "name", "subquery");
+//	tuple_append($$, v_tuple, "subquery", $2);
     }
     |
     LPAREN select_statement RPAREN AS IDENTIFIER
     {
-	new_tuple($$, v_text, "name", "subquery");
-	tuple_append($$, v_text, "alias", $5);
-	tuple_append($$, v_tuple, "subquery", $2);
+//	new_tuple($$, v_text, "name", "subquery");
+//	tuple_append($$, v_text, "alias", $5);
+//	tuple_append($$, v_tuple, "subquery", $2);
     }
 ;
 
 table_ref_list:
     table_ref
     {
-	new_tuple($$, v_tuple, "table", $1);
+//	new_tuple($$, v_tuple, "table", $1);
     }
     |
     table_ref_list COMMA table_ref
     {
-	tuple_append($$,v_tuple, "table", $3);	
+//	tuple_append($$,v_tuple, "table", $3);	
     }
 ;
 
 from_clause:
     FROM table_ref_list
     {
-	$$=$2;
+//	$$=$2;
     }
 ;
 
 where_clause:
     empty
     {
-	$$=NULL;
+//	$$=NULL;
     }
     |
     WHERE scalar_expr
     {
-	$$=$2;
+//	$$=$2;
     }
 ;
 
 having_clause:
     empty
     {
-	$$=NULL;
+//	$$=NULL;
     }
     |
     HAVING scalar_expr
     {
-	$$=$2;
+//	$$=$2;
     }
 ;
 
 order_by_clause:
     empty
     {
-	$$=NULL;
+//	$$=NULL;
     }
     |
     ORDER BY order_by_list
     {
-	$$=$3;
+//	$$=$3;
     }
 ;
 
 order_by_list:
     order_by_list_item
     {
-	new_tuple($$, v_tuple, "order_by_expression", $1);
+//	new_tuple($$, v_tuple, "order_by_expression", $1);
     }
     |
     order_by_list COMMA order_by_list_item
     {
-	tuple_append($$, v_tuple, "order_by_expression", $3);
+//	tuple_append($$, v_tuple, "order_by_expression", $3);
     }
 ;
 
 order_by_list_item:
     scalar_expr order_by_direction order_by_nulls  
     {
-	new_tuple($$, v_sexpr, "value", $1);	
-	if ($2 != NULL) tuple_append($$, v_text, "direction", $2); 
-	if ($3 != NULL) tuple_append($$, v_text, "nulls", $3); 
+//	new_tuple($$, v_sexpr, "value", $1);	
+//	if ($2 != NULL) tuple_append($$, v_text, "direction", $2); 
+//	if ($3 != NULL) tuple_append($$, v_text, "nulls", $3); 
     }
 ;
 
 order_by_direction:
     empty
     {
-	$$=NULL;
+//	$$=NULL;
     }
     |
     ASC
     {
-	$$="asc";
+//	$$="asc";
     }
     |
     DESC
     {
-	$$="desc";
+//	$$="desc";
     }
 ;
 
 order_by_nulls:
     empty
     {
-	$$=NULL;
+//	$$=NULL;
     }
     |
     NULLS FIRST
     {
-	$$="first";
+//	$$="first";
     }
     |
     NULLS LAST
     {
-	$$="last";
+//	$$="last";
     }
 ; 
 
 group_by_clause:
     empty
     {
-	$$=NULL;
+//	$$=NULL;
     }
     |
     GROUP BY scalar_expr
     {
-	$$=$3;
+//	$$=$3;
     }
 ;
 
 table_expr:
     from_clause where_clause group_by_clause having_clause order_by_clause
     {
-	new_tuple($$, v_tuple, "from_clause", $1);
-	if ($2 != NULL) tuple_append($$, v_sexpr, "where_clause", $2); 
-	if ($3 != NULL) tuple_append($$, v_sexpr, "group_by_clause", $3); 
-	if ($4 != NULL) tuple_append($$, v_sexpr, "having_clause", $4); 
-	if ($5 != NULL) tuple_append($$, v_tuple, "order_by_clause", $5); 
+//	new_tuple($$, v_tuple, "from_clause", $1);
+//	if ($2 != NULL) tuple_append($$, v_sexpr, "where_clause", $2); 
+//	if ($3 != NULL) tuple_append($$, v_sexpr, "group_by_clause", $3); 
+//	if ($4 != NULL) tuple_append($$, v_sexpr, "having_clause", $4); 
+//	if ($5 != NULL) tuple_append($$, v_tuple, "order_by_clause", $5); 
     }
 ;
 
@@ -420,82 +422,82 @@ EXPRESSIONS
 scalar_expr:
     value_expr
     { 
-	$$ = MAKENODE(s_expr);
-	$$->value = $1;
-	$$->left = NULL;
-	$$->right = NULL;
-	$$->list.next = NULL;
-	$$->list.prev = NULL;
+//	$$ = MAKENODE(s_expr);
+//	$$->value = $1;
+//	$$->left = NULL;
+//	$$->right = NULL;
+//	$$->list.next = NULL;
+//	$$->list.prev = NULL;
     }
     |
     LPAREN scalar_expr RPAREN
     { 
-	$$ = $2;
+//	$$ = $2;
     }
     |
     scalar_expr ADD scalar_expr 
     {
-	mk_s_expr_oper($$, "ADD", $1, $3);
+//	mk_s_expr_oper($$, "ADD", $1, $3);
     }
     |
     scalar_expr MUL scalar_expr 		
     {
-	mk_s_expr_oper($$, "MUL", $1, $3);
+//	mk_s_expr_oper($$, "MUL", $1, $3);
     }
     |
     scalar_expr DIV scalar_expr 		
     {
-	mk_s_expr_oper($$, "DIV", $1, $3);
+//	mk_s_expr_oper($$, "DIV", $1, $3);
     }
     |
     scalar_expr MOD scalar_expr 		
     {
-	mk_s_expr_oper($$, "MOD", $1, $3);
+//	mk_s_expr_oper($$, "MOD", $1, $3);
     }
     |
     scalar_expr AND scalar_expr 		
     {
-	mk_s_expr_oper($$, "AND", $1, $3);
+//	mk_s_expr_oper($$, "AND", $1, $3);
     }
     |
     scalar_expr OR scalar_expr 		
     {
-	mk_s_expr_oper($$, "OR", $1, $3);
+//	mk_s_expr_oper($$, "OR", $1, $3);
     }
     |
     scalar_expr EQ scalar_expr 		
     {
-	mk_s_expr_oper($$, "EQ", $1, $3);
+//	mk_s_expr_oper($$, "EQ", $1, $3);
     }
     |
     scalar_expr NE scalar_expr 		 
     {
-	mk_s_expr_oper($$, "NE", $1, $3);
+//	mk_s_expr_oper($$, "NE", $1, $3);
     }
     |
     scalar_expr GT scalar_expr 		
     {
-	mk_s_expr_oper($$, "GT", $1, $3);
+//	mk_s_expr_oper($$, "GT", $1, $3);
     }
     |
     scalar_expr LT scalar_expr 		
     {
-	mk_s_expr_oper($$, "LT", $1, $3);
+//	mk_s_expr_oper($$, "LT", $1, $3);
     }
     |
     scalar_expr GE scalar_expr 		
     {
-	mk_s_expr_oper($$, "GE", $1, $3);
+//	mk_s_expr_oper($$, "GE", $1, $3);
     }
     |
     scalar_expr LE scalar_expr 	
     {
-	mk_s_expr_oper($$, "LE", $1, $3);
+//	mk_s_expr_oper($$, "LE", $1, $3);
     }
     |
     scalar_expr SUB scalar_expr 	
     {
-	mk_s_expr_oper($$, "SUB", $1, $3);
+//	mk_s_expr_oper($$, "SUB", $1, $3);
     }
     |
     scalar_expr IN LPAREN in_predicate RPAREN
@@ -516,130 +518,126 @@ scalar_expr:
     |
     scalar_expr IS scalar_expr
     {
-	mk_s_expr_oper($$, "IS", $1, $3);
+//	mk_s_expr_oper($$, "IS", $1, $3);
     }
     |
     scalar_expr IS NOT scalar_expr
     {
-	mk_s_expr_oper($$, "ISNOT", $1, $4);
+//	mk_s_expr_oper($$, "ISNOT", $1, $4);
     }
 ;
 
 value_expr:
 	colref
 	{ 
-	    $$=$1;
+//	    $$=$1;
 	}
 	|
 	boolean
 	{
-	    mk_tuplist_lit($$, v_text, "BOOL", $1);
+//	    mk_tuplist_lit($$, v_text, "BOOL", $1);
 	}
 	|
 	sqlval
 	{
-	    mk_tuplist_lit($$, v_text, "SQLV", $1);
+//	    mk_tuplist_lit($$, v_text, "SQLV", $1);
 	}
 	|
 	INT_LIT
 	{
-	    mk_tuplist_lit($$, v_int, "INT", $1);
+//	    mk_tuplist_lit($$, v_int, "INT", $1);
 	}
 	|	
 	NUM_LIT 
 	{
-	    mk_tuplist_lit($$, v_float, "NUM", $1);
+//	    mk_tuplist_lit($$, v_float, "NUM", $1);
 	}
 	|	
 	STRING
 	{
-	    mk_tuplist_lit($$, v_text, "TEXT", $1);
+//	    mk_tuplist_lit($$, v_text, "TEXT", $1);
 	}
 	|
 	function
 	{
-	    $$=$1;
+//	    $$=$1;
 	}
 ;
 
 boolean:
     TRUE    
     {
-	$$="true";	
+//	$$="true";	
     }
     |
     FALSE
     {
-	$$="false";	
+//	$$="false";	
     }
 ;
 
 sqlval:
     _NULL
     {
-	$$="sqlnull";	
+//	$$="sqlnull";	
     }
     |
     UNKNOWN
     {
-	$$="unknown";	
+//	$$="unknown";	
     }
 ;
 
 function:
     case_expr 	
     {
-	$$=$1;
+//	$$=$1;
     }
 ;
 
 case_expr:
     CASE case_expr_when_list ELSE scalar_expr END 
     {
-	new_tuple($$, v_tuple, "when_list", $2);
-	tuple_append($$, v_sexpr, "else", $4);
+//	new_tuple($$, v_tuple, "when_list", $2);
+//	tuple_append($$, v_sexpr, "else", $4);
     }
     |
     CASE case_expr_when_list END
     {
-	new_tuple($$, v_tuple, "when_list", $2);
+//	new_tuple($$, v_tuple, "when_list", $2);
     }
 ;
 
 case_expr_when_list:
     case_expr_when
     {
-	new_tuple($$, v_tuple, "when", $1);
+//	new_tuple($$, v_tuple, "when", $1);
     }
     |
     case_expr_when_list case_expr_when
     {
-	tuple_append($$, v_tuple, "when", $2);
+//	tuple_append($$, v_tuple, "when", $2);
     }
 ;
 
 case_expr_when:
     WHEN scalar_expr THEN scalar_expr
     {
-	new_tuple($$, v_sexpr, "condition", $2);
-	tuple_append($$, v_sexpr, "result", $4);	
+//	new_tuple($$, v_sexpr, "condition", $2);
+//	tuple_append($$, v_sexpr, "result", $4);	
     }
 ; 
-
-//builtin_func:
-//;
-
 
 colref:
 	IDENTIFIER 
 	{ 
-                new_tuple($$,v_text,"class","identifier");  
-		tuple_append($$, v_text, "value", $1);
+//                new_tuple($$,v_text,"class","identifier");  
+//		tuple_append($$, v_text, "value", $1);
 	}
 	|
 	IDENTIFIER POINT IDENTIFIER  
 	{
-		mk_tuplist_ident($$, $1, $3);
+//		mk_tuplist_ident($$, $1, $3);
 	}
 ;
 
