@@ -11,44 +11,12 @@
 
 package main
 //import "fmt"
-import "regexp"
-
-
-const (
-	SELECT int = iota
-)
 
 var SQLkeys = map[string]int{
         "select": SELECT,
 }
 
-// Token type contains code val and regexp pattern, not used for keywords
-type token struct {
-        code int
-        pat regexp.Regexp
-}
-// Precompiled regular expressions for matching tokens
-var Regint = regexp.MustCompile(regintpat)                      //integer token
-var Regnum = regexp.MustCompile(regnumpat)                      //numeric token
-var Regnym = regexp.MustCompile(regnympat)                      //identifier token
-
-// Constant values for regular expression patterns
-const (
-        regintpat string = "^[0-9]+$"
-        regnumpat string = "^[0-9]+\\.[0-9]+$"
-        regnympat string = "^[a-zA-Z_]+\\w*"
-)
-
-// The parser expects the lexer to return 0 on EOF.  Give it a name
-// for clarity.
 const eof = 0
-
-// Quoting state enum
-const (
-        unquoted int = iota
-        string_quoted
-        ident_quoted
-)
 
 // The parser uses the type <prefix>Lex as a lexer.  It must provide
 // the methods Lex(*<prefix>SymType) int and Error(string).
@@ -58,89 +26,61 @@ type exprLex struct {
 	tokend int			//end of current token 
 }
 
-func (x *exprLex) popbuf() bool {
-        if len(x.line) < 1 {
-                return false
-        }
-        x.c = x.line[:1]
-        x.line = x.line[1:]
-        return true
-}
-
 func (x *exprLex) peek() rune {
         if len(x.line) < 1 {
                 return nil
         }
-        return x.line[:1]
+        return x.line[:x.tokstart]
 }
 
-func (x *exprLex) pushstack() bool {
-
-        if x.eat == true {
-                x.eat = false
-                return false
-        }
-
-        //push the char on to stack...
-        append(x.stack, x.c)
+// Ignore this space
+func (x *exprLex) ignore() {
 
 }
 
-func (x *exprLex) matchTok(yylval *exprSymType) int {
-  //Pop the contents of the stack into a variable tok.
-  //y. If quoted != false, set class to STRING
-  //Attempt to match the contents of tok to a token class.
-  //Return the token class and yylval (or error if the token cannot be matched). Go to 1.
+// We're inside double quotes. 
+// Lex an identifier
+func (x *exprLex) lexdquote() {
 
-  // Token match detail
-  // If quoted - we are a string or a identifier (hopefully)
+/*
+	* consume input
+	* permit any character including spaces
+	* peek when quote encountered, to see if
+	* escaped quote or end of token
+*/
+	x.typ = IDENT
 
-  tokval := x.stack
-  x.stack = nil
-  yylval = nil
-
-  switch x.qs {
-        case string:
-                yylval.text = tokval
-                return STRING
-        case identifier:
-                yylval.text = tokval
-                return IDENTIFIER
-        }
-
-  // Attempt to match a keyword
-  n := x.matchKeyword(tokval)
-  if (n != nil) {
-        return n
-  }
-
-  // Attempt to match an operator
-  switch tokval {
-   case '+' : return SUM
-   case '-' : return SUB
-   case '*' : return MUL
-   case '/' : return DIV
-   case '=' : return EQ
-//   case '\!=': return NE
-   case ')' : return RPAREN
-   case '(' : return LPAREN
-   case '%' : return MOD
-   case ',' : return COMMA
-  }
-
-  // Attempt to match an integer
-
-
-  // Attempt to match a numeric
-
-  // Attempt to match an unquoted identifier
-
+	for n := x.next()  {
+	  if n == "\"" {
+		if x.peek() != "\"" {
+			return
+		}
+	  }
+	}
 }
+
+// We're inside single quotes. 
+// Lex a string literal
+func (x *exprLex) lexsquote() {
+
+	x.typ = STRING
+
+	for n := x.next()  {
+	  if n == "'" {
+	    if x.peek() != "'" {
+	      return
+	    }
+	  }
+	}
+}
+
+// We've hit what looks like the 
+// start of a number. 
+// Try to lex a numeric literal 
+
 
 // The parser calls this method to get each new token.
 func (x *exprLex) Lex(yylval *exprSymType) int {
-
-        var rune p
 
 	//This is called either at the very beginning of the 
 	//string to be parsed or at the start of a new 
@@ -148,21 +88,28 @@ func (x *exprLex) Lex(yylval *exprSymType) int {
 
         start:
 
-	switch next {
-
-	space:
-		x.ignore
-	dquote:
+	switch n := x.next() {
+	  case n == eof:
+		//do something at end-of-input
+	  case isSpace(n):
+		x.ignore()
+	  case r == "\"":
 		x.lexdquote()
-	squote:
+	  case r == "'":
 		x.lexsquote()
-	alphanum:
-		x.lex
-	number:
-
+	  case r >= '0' && r <= '9':
+		x.lexnumber()
+	  case isAlphaNumeric(r):
+		//Here we could match an identifier or a 
+		//keyword
+		x.lextext()
+	  case r == ".":
+		x.lexpoint()
+	  case r == ";":
+		x.lexterm()
+	  default:
+		x.lexoper()
 	}
-
-
 
         goto start
 }
