@@ -1,34 +1,25 @@
-// Copyright 2013 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-// This is an example of a goyacc program.
-// To build it:
-// go tool yacc -p "expr" expr.y (produces y.go)
-// go build -o expr y.go
-// expr
-// > <type an expression>
-
 package main
-//import "fmt"
 
-var SQLkeys = map[string]int{
-        "select": SELECT,
-}
+import "log"
+import "bufio"
+import "os"
+import "io"
 
 const eof = 0
 
 // The parser uses the type <prefix>Lex as a lexer.  It must provide
 // the methods Lex(*<prefix>SymType) int and Error(string).
 type exprLex struct {
-        line string                     //Buffer containing SQL input text to be lexed
-	tokstart int			//start of current token
-	tokend int			//end of current token 
+        line		string                  //Buffer containing SQL input text to be lexed
+	tokstart	int			//start of current token
+	tokend		int			//end of current token 
+	pos		int			//current position in input
+	typ		int			//current token type
 }
 
 func (x *exprLex) peek() rune {
         if len(x.line) < 1 {
-                return nil
+                return 0
         }
         return x.line[:x.tokstart]
 }
@@ -48,14 +39,16 @@ func (x *exprLex) lexdquote() {
 	* peek when quote encountered, to see if
 	* escaped quote or end of token
 */
-	x.typ = IDENT
+	x.typ = IDENTIFIER
 
-	for n := x.next()  {
-	  if n == "\"" {
-		if x.peek() != "\"" {
-			return
-		}
+	for {
+	  n := x.next()
+	  if n == '"' {
+	    if x.peek() != '"' {
+	      return
+	    }
 	  }
+	  //TODO insert a check for max identifier length
 	}
 }
 
@@ -65,19 +58,47 @@ func (x *exprLex) lexsquote() {
 
 	x.typ = STRING
 
-	for n := x.next()  {
-	  if n == "'" {
-	    if x.peek() != "'" {
+	for {
+	  n := x.next()
+	  if n == `'` {
+	    if x.peek() != `'` {
 	      return
 	    }
 	  }
 	}
 }
 
+func (x *exprLex) lexnumber() {
+
+}
 // We've hit what looks like the 
 // start of a number. 
 // Try to lex a numeric literal 
 
+func (x *exprLex) lextext() {
+
+}
+
+
+func (x *exprLex) lexpoint() {
+
+}
+
+
+func (x *exprLex) lexoper() {
+
+}
+
+func (x *exprLex) lexterm() {
+
+}
+
+// Return the next rune for the lexer.
+func (x *exprLex) next() rune {
+
+	r, w := utf8.DecodeRuneInString(x.line[x.pos:])
+	return r
+}
 
 // The parser calls this method to get each new token.
 func (x *exprLex) Lex(yylval *exprSymType) int {
@@ -85,53 +106,36 @@ func (x *exprLex) Lex(yylval *exprSymType) int {
 	//This is called either at the very beginning of the 
 	//string to be parsed or at the start of a new 
 	//token
+	n := x.next()
 
-        start:
-
-	switch n := x.next() {
-	  case n == eof:
+	switch {
+		//case n == eof:
 		//do something at end-of-input
-	  case isSpace(n):
+	  case n == " ":
 		x.ignore()
-	  case r == "\"":
+	  case n == "\"":
 		x.lexdquote()
-	  case r == "'":
+	  case n == "'":
 		x.lexsquote()
-	  case r >= '0' && r <= '9':
+	  case n >= "0" && n <= "9":
 		x.lexnumber()
-	  case isAlphaNumeric(r):
+	  case isAlphaNumeric(n):
 		//Here we could match an identifier or a 
 		//keyword
 		x.lextext()
-	  case r == ".":
+	  case n == ".":
 		x.lexpoint()
-	  case r == ";":
+	  case n == ";":
 		x.lexterm()
 	  default:
 		x.lexoper()
 	}
 
-        goto start
+	return 0
 }
 
-
-// Return the next rune for the lexer.
-func (x *exprLex) next() rune {
-        if x.peek != eof {
-                r := x.peek
-                x.peek = eof
-                return r
-        }
-        if len(x.line) == 0 {
-                return eof
-        }
-        c, size := utf8.DecodeRune(x.line)
-        x.line = x.line[size:]
-        if c == utf8.RuneError && size == 1 {
-                log.Print("invalid utf8")
-                return x.next()
-        }
-        return c
+func isAlphaNumeric(r string) bool {
+   return r == "_" || unicode.IsLetter(r) || unicode.IsDigit(r)
 }
 
 // The parser calls this method on a parse error.
