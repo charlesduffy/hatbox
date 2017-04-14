@@ -14,11 +14,12 @@ package main
 
 %union 
 {
-integer_val	int
-text_val	string
-float_val	string
-keyword_val	string
-identifier_val	string
+//integer_val	 int
+tokval	 string
+//text_val	 string
+//float_val	 string
+//keyword_val	 string
+//identifier_val string
 }
 
 /*

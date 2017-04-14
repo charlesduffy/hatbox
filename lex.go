@@ -1,9 +1,13 @@
 package main
 
-import "log"
-import "bufio"
-import "os"
-import "io"
+import ( 	"log"
+		"bufio"
+		"os"
+		"io"
+		"unicode"
+		"unicode/utf8"
+		"strings"
+)
 
 const eof = 0
 
@@ -11,17 +15,18 @@ const eof = 0
 // the methods Lex(*<prefix>SymType) int and Error(string).
 type exprLex struct {
         line		string                  //Buffer containing SQL input text to be lexed
-	tokstart	int			//start of current token
-	tokend		int			//end of current token 
-	pos		int			//current position in input
+	tok		int			//start of current token
+	pos		int			//current character position in input
 	typ		int			//current token type
+	w		int			//width of rune
 }
 
 func (x *exprLex) peek() rune {
         if len(x.line) < 1 {
                 return 0
         }
-        return x.line[:x.tokstart]
+	r, _ := utf8.DecodeRuneInString(x.line[x.pos:])
+	return r
 }
 
 // Ignore this space
@@ -48,7 +53,7 @@ func (x *exprLex) lexdquote() {
 	      return
 	    }
 	  }
-	  //TODO insert a check for max identifier length
+	  //TODO consider inserting a check for max identifier length
 	}
 }
 
@@ -60,31 +65,76 @@ func (x *exprLex) lexsquote() {
 
 	for {
 	  n := x.next()
-	  if n == `'` {
-	    if x.peek() != `'` {
+	  if n == '\'' {
+	    if x.peek() != '\'' {
 	      return
 	    }
 	  }
 	}
 }
 
-func (x *exprLex) lexnumber() {
-
-}
 // We've hit what looks like the 
 // start of a number. 
 // Try to lex a numeric literal 
+func (x *exprLex) lexnumber() {
 
-func (x *exprLex) lextext() {
+	x.typ = NUMERIC
+
+	for {
+	  n := x.next()
+	  if ! unicode.IsDigit(n) || n != '.' {
+	  //here we have encountered a rune that is not
+	  //accepted within a numeric token. 
+	  //if it is not a delimiter or an operator, then raise error
+	    if o := x.peek(); o =='.' || isOperator(o) || o == ';' {
+	     p:=x.emit() //just for debug
+log.Printf("Token is: >>%s<<\n", p)
+		return
+	    } else {
+	       //raise error. 
+	    }
+	  }
+	}
 
 }
 
+// This can either be an unquoted identifier,
+// or a keyword
+func (x *exprLex) lextext() {
 
+// consume characters until
+// we encounter one not in the accepted
+// set for a keyword or an identifier.
+// The accepted set is:
+// a-zA-Z0-9_
+	x.typ = IDENTIFIER
+
+	for {
+	  n := x.next()
+	  if ! isAlphaNumeric(n) {
+	  //here we have encountered the end of the token. 
+	  //determine if it is a keyword.
+	    o := x.emit()
+
+log.Printf("Token is: >>%s<<\n", o)
+	    if l, ok := SQLkeys[strings.ToLower(o)]; ok {
+	      x.typ = l
+	    }
+	    return
+	  }
+	}
+}
+
+// Lex a point character. In this context it 
+// will be a delimiter between table / column 
+// identifiers
 func (x *exprLex) lexpoint() {
 
 }
 
-
+// Lex an operator. An operator is one or more
+// characters from the list of:
+// + - * / % ! =
 func (x *exprLex) lexoper() {
 
 }
@@ -97,45 +147,73 @@ func (x *exprLex) lexterm() {
 func (x *exprLex) next() rune {
 
 	r, w := utf8.DecodeRuneInString(x.line[x.pos:])
+	x.pos = x.pos + w
 	return r
+}
+
+// Return the current token
+func (x *exprLex) emit() string {
+
+	r := x.line[x.tok:x.pos-1]
+	return r
+}
+
+//move up the tok pointer
+func (x *exprLex) shift() {
+
+	x.tok = x.pos
 }
 
 // The parser calls this method to get each new token.
 func (x *exprLex) Lex(yylval *exprSymType) int {
-
+log.Printf("Entering Lex function")
 	//This is called either at the very beginning of the 
 	//string to be parsed or at the start of a new 
 	//token
 	n := x.next()
 
+log.Printf("Next rune is: %c",n)
 	switch {
 		//case n == eof:
 		//do something at end-of-input
-	  case n == " ":
+	  case n == ' ':
 		x.ignore()
-	  case n == "\"":
+	  case n == '"':
 		x.lexdquote()
-	  case n == "'":
+	  case n == '\'':
 		x.lexsquote()
-	  case n >= "0" && n <= "9":
+	  case n >= '0' && n <= '9':
 		x.lexnumber()
-	  case isAlphaNumeric(n):
+	  case n == '_' || unicode.IsLetter(n):
 		//Here we could match an identifier or a 
 		//keyword
 		x.lextext()
-	  case n == ".":
+	  case n == '.':
 		x.lexpoint()
-	  case n == ";":
+	  case n == ';':
 		x.lexterm()
 	  default:
 		x.lexoper()
 	}
+	log.Printf("Lexer: %+v\n", x)
 
-	return 0
+	yylval.tokval = x.emit()
+	x.shift()
+	return x.typ
 }
 
-func isAlphaNumeric(r string) bool {
-   return r == "_" || unicode.IsLetter(r) || unicode.IsDigit(r)
+func isAlphaNumeric(r rune) bool {
+   return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
+}
+
+func isOperator(r rune) bool {
+   operchars := "+-/*%!=^~"
+
+   if strings.IndexRune(operchars, r) == -1 {
+     return false
+   } else {
+     return true
+   }
 }
 
 // The parser calls this method on a parse error.
@@ -157,6 +235,6 @@ func main() {
                         log.Fatalf("ReadBytes: %s", err)
                 }
 
-                exprParse(&exprLex{line: line})
+                exprParse(&exprLex{line: string(line)})
         }
 }
