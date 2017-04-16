@@ -2,6 +2,8 @@
 
 package main
 
+import "log"
+
 %}
 
 /* parser options 
@@ -75,6 +77,8 @@ tokval	 string
 %left           POINT
 %left 		AS
 
+%token FOOBAR
+
 %type <Tuple>	sql query_statement select_statement select_list u_select_list_item select_list_item table_ref
 		table_ref_list value_expr colref table_expr
 		function case_expr case_expr_when_list case_expr_when from_clause 
@@ -118,6 +122,7 @@ sql:
 	$$->list.next = NULL;	
 	$$->list.prev = NULL;	
 */
+	log.Printf("parser: query_statement SEMICOLON")
     }
     |
     sql query_statement SEMICOLON

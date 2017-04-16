@@ -147,7 +147,8 @@ func (x *exprLex) lexoper() {
 }
 
 func (x *exprLex) lexterm() {
-
+	x.typ = SEMICOLON
+	return
 }
 
 // Return the next rune for the lexer.
@@ -161,6 +162,9 @@ func (x *exprLex) next() rune {
 // Return the current token
 func (x *exprLex) emit() string {
 
+	if (x.pos - 1 > len(x.line)) {
+		return ""
+	}
 	r := x.line[x.tok:x.pos-1]
 	return r
 }
@@ -181,8 +185,9 @@ log.Printf("Entering Lex function")
 
 log.Printf("Next rune is: %c",n)
 	switch {
-		//case n == eof:
-		//do something at end-of-input
+	  case n == eof:
+log.Printf("Found EOF")
+		return eof
 	  case n == ' ':
 		x.ignore()
 	  case n == '"':
