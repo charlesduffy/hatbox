@@ -77,23 +77,30 @@ func (x *exprLex) lexsquote() {
 // start of a number. 
 // Try to lex a numeric literal 
 func (x *exprLex) lexnumber() {
-
+log.Printf("Entering lexnumber()")
 	x.typ = NUMERIC
 
 	for {
 	  n := x.next()
-	  if ! unicode.IsDigit(n) || n != '.' {
+	  if unicode.IsDigit(n) != true && n != '.' {
+log.Printf("Not a digit or dot")
 	  //here we have encountered a rune that is not
 	  //accepted within a numeric token. 
-	  //if it is not a delimiter or an operator, then raise error
-	    if o := x.peek(); o =='.' || isOperator(o) || o == ';' {
+
+log.Printf("Peek character is: >>%c<<", n)
+
+	    if  isOperator(n) || n == ';'|| isWhitespace(n) {
 	     p:=x.emit() //just for debug
 log.Printf("Token is: >>%s<<\n", p)
-		return
+	     return
+log.Printf("after return???")
 	    } else {
 	       //raise error. 
+	    x.Error(x.line)
+	    return
 	    }
 	  }
+log.Printf("Another numeric rune...")
 	}
 
 }
@@ -199,11 +206,22 @@ log.Printf("Next rune is: %c",n)
 
 	yylval.tokval = x.emit()
 	x.shift()
+log.Printf("Lexed token! yylval: %s toktyp: %d", yylval.tokval, x.typ)
 	return x.typ
 }
 
 func isAlphaNumeric(r rune) bool {
    return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
+}
+
+func isWhitespace(r rune) bool {
+   wschars := " " //TODO add tabs, newlines
+
+   if strings.IndexRune(wschars, r) == -1 {
+     return false
+   } else {
+     return true
+   }
 }
 
 func isOperator(r rune) bool {
