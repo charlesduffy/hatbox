@@ -31,7 +31,8 @@ func (x *exprLex) peek() rune {
 
 // Ignore this space
 func (x *exprLex) ignore() {
-
+	x.pos += x.width
+	x.shift()
 }
 
 // We're inside double quotes. 
@@ -249,6 +250,7 @@ log.Printf("Entering Lex function")
 	//This is called either at the very beginning of the 
 	//string to be parsed or at the start of a new 
 	//token
+	L:
 	n := x.curr()
 
 log.Printf("Next rune is: %c",n)
@@ -259,6 +261,7 @@ log.Printf("Found EOF")
 	  case n == ' ':
 log.Printf("Found space");
 		x.ignore()
+		goto L
 	  case n == '"':
 log.Printf("Found double quote")
 		x.lexdquote()
