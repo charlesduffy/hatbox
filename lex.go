@@ -29,8 +29,8 @@ func (x *exprLex) peek() rune {
 	return r
 }
 
-// Ignore this space
-func (x *exprLex) ignore() {
+// Ignore this character
+func (x *exprLex) consume() {
 	x.pos += x.width
 	x.shift()
 }
@@ -152,6 +152,7 @@ log.Printf("Entering Lexpoint")
 func (x *exprLex) lexcomma() {
 log.Printf("Entering Lexcomma")
 	x.typ =  COMMA
+	x.consume()
 	return
 }
 
@@ -164,6 +165,7 @@ func (x *exprLex) lexoper() {
 func (x *exprLex) lexterm() {
 log.Printf("Entering Lexterm")
 	x.typ = SEMICOLON
+	x.consume()
 	return
 }
 
@@ -172,6 +174,12 @@ log.Printf("Entering Lexterm")
 func (x *exprLex) gettok() (rune, int) {
 log.Printf("Entering gettok() %s", x.line[x.pos:])
 	x.ptok()
+
+	if (x.tok == x.pos && x.pos == len(x.line) - 1) {
+		//end of the line
+		return eof, 0
+	}
+
 	r, w := utf8.DecodeRuneInString(x.line[x.pos:])
 	if w == 0 {
 		log.Printf("NO MORE RUNES!!!")
@@ -219,7 +227,7 @@ func (x *exprLex) ptok() {
 		posspace += " "
 		i++
 	}
-	log.Printf("line          |%s", x.line)
+	log.Printf("line          |%s|", x.line)
 	log.Printf("tok[%2.2d]       |%s^",x.tok, tokspace)
 	log.Printf("pos[%2.2d]       |%s^",x.pos, posspace)
 
@@ -231,6 +239,7 @@ log.Printf("Entering emit()")
 log.Printf("len: %d tok: %d pos: %d\n", len(x.line), x.tok, x.pos)
 
 	if (x.pos >= len(x.line)) {
+log.Printf("Emit() says, token zero length, pos at EOL")
 		return ""
 	}
 	r := x.line[x.tok:x.pos]
@@ -255,12 +264,15 @@ log.Printf("Entering Lex function")
 
 log.Printf("Next rune is: %c",n)
 	switch {
+	  case n == '\n':
+log.Printf("short circuit eof")
+		return eof
 	  case n == eof:
 log.Printf("Found EOF")
 		return eof
-	  case n == ' ':
+	  case n == ' ' || n == '\n':
 log.Printf("Found space");
-		x.ignore()
+		x.consume()
 		goto L
 	  case n == '"':
 log.Printf("Found double quote")
