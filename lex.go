@@ -1,6 +1,6 @@
 package main
 
-import ( 	"log"
+import (	"log"
 		"bufio"
 		"os"
 		"io"
@@ -18,7 +18,7 @@ type exprLex struct {
 	tok		int			//start of current token
 	pos		int			//current character position in input
 	typ		int			//current token type
-	w		int			//width of rune
+	width		int			//width of rune
 }
 
 func (x *exprLex) peek() rune {
@@ -47,7 +47,7 @@ func (x *exprLex) lexdquote() {
 	x.typ = IDENTIFIER
 
 	for {
-	  n,_ := x.next()
+	  n := x.next()
 	  if n == '"' {
 	    if x.peek() != '"' {
 	      return
@@ -64,7 +64,7 @@ func (x *exprLex) lexsquote() {
 	x.typ = STRING
 
 	for {
-	  n,_ := x.next()
+	  n := x.next()
 	  if n == '\'' {
 	    if x.peek() != '\'' {
 	      return
@@ -81,7 +81,7 @@ log.Printf("Entering lexnumber()")
 	x.typ = NUMERIC
 
 	for {
-	  n,_ := x.next()
+	  n := x.next()
 	  if unicode.IsDigit(n) != true && n != '.' {
 log.Printf("Not a digit or dot")
 	  //here we have encountered a rune that is not
@@ -117,7 +117,7 @@ func (x *exprLex) lextext() {
 log.Printf("Entering lextext")
 
 	for {
-	  n,_ := x.next()
+	  n := x.next()
 	  if ! isAlphaNumeric(n) {
 	  //here we have encountered the end of the token. 
 	  //determine if it is a keyword.
@@ -166,17 +166,62 @@ log.Printf("Entering Lexterm")
 	return
 }
 
-// Return the next rune for the lexer.
-func (x *exprLex) next() (rune, int) {
-
+//func get tok
+//get the 'current' token
+func (x *exprLex) gettok() (rune, int) {
+log.Printf("Entering gettok() %s", x.line[x.pos:])
+	x.ptok()
 	r, w := utf8.DecodeRuneInString(x.line[x.pos:])
 	if w == 0 {
 		log.Printf("NO MORE RUNES!!!")
 		return eof, 0
 	} else {
-	x.pos = x.pos + w
 	return r,w
 	}
+
+}
+
+//func curr
+//wrapper around get current
+func (x *exprLex) curr() (rune) {
+log.Printf("Entering curr()")
+	r,w := x.gettok()
+	x.width = w
+	return r
+}
+
+//func mext
+//get next
+
+
+
+// Return the next rune for the lexer.
+func (x *exprLex) next() (rune) {
+log.Printf("Entering next()")
+	x.pos = x.pos + x.width
+	r,w := x.gettok()
+	x.width = w
+	return r
+}
+
+func (x *exprLex) ptok() {
+//	log.Printf("          0  1   2   3   4   5   6   7   8   9   10 11 12 13 14")
+	var i int = 0
+	var tokspace string = ""
+	var posspace string = ""
+	for i < x.tok {
+		tokspace += " "
+		i++
+	}
+	i = 0
+	for i < x.pos {
+		posspace += " "
+		i++
+	}
+	log.Printf("line          |%s", x.line)
+	log.Printf("tok[%2.2d]       |%s^",x.tok, tokspace)
+	log.Printf("pos[%2.2d]       |%s^",x.pos, posspace)
+
 }
 
 // Return the current token
@@ -184,10 +229,10 @@ func (x *exprLex) emit() string {
 log.Printf("Entering emit()")
 log.Printf("len: %d tok: %d pos: %d\n", len(x.line), x.tok, x.pos)
 
-	if (x.pos - 1 > len(x.line)) {
+	if (x.pos >= len(x.line)) {
 		return ""
 	}
-	r := x.line[x.tok:x.pos-1]
+	r := x.line[x.tok:x.pos]
 	return r
 }
 
@@ -204,7 +249,7 @@ log.Printf("Entering Lex function")
 	//This is called either at the very beginning of the 
 	//string to be parsed or at the start of a new 
 	//token
-	n, _ := x.next()
+	n := x.curr()
 
 log.Printf("Next rune is: %c",n)
 	switch {
@@ -212,25 +257,34 @@ log.Printf("Next rune is: %c",n)
 log.Printf("Found EOF")
 		return eof
 	  case n == ' ':
+log.Printf("Found space");
 		x.ignore()
 	  case n == '"':
+log.Printf("Found double quote")
 		x.lexdquote()
 	  case n == '\'':
+log.Printf("Found single quote")
 		x.lexsquote()
 	  case n >= '0' && n <= '9':
+log.Printf("Found digit")
 		x.lexnumber()
 	  case n == '.':
+log.Printf("Found point")
 		x.lexpoint()
 	  case n == ';':
+log.Printf("Found semicolon")
 		x.lexterm()
 	  case n == ',':
+log.Printf("Found comma")
 		x.lexcomma()
 	  case n == '_' || unicode.IsLetter(n):
+log.Printf("Found text")
 		//Here we could match an identifier or a 
 		//keyword
 		//could be sensitive to order in switch stmt
 		x.lextext()
 	  default:
+log.Printf("Found default oper")
 		x.lexoper()
 	}
 	log.Printf("Lexer: %+v\n", x)
