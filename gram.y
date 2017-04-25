@@ -122,11 +122,12 @@ sql:
 	$$->list.next = NULL;	
 	$$->list.prev = NULL;	
 */
-	log.Printf("parser: query_statement SEMICOLON")
+	log.Printf("PARSER: query_statement SEMICOLON")
     }
     |
     sql query_statement SEMICOLON
     {
+	log.Printf("PARSER: sql query_statement SEMICOLON")
 //	tuple_append(ptree , v_tuple, "query", $2);
     }
 ;
@@ -134,6 +135,7 @@ sql:
 query_statement:
     select_statement 
     { 
+	log.Printf("PARSER: select_statement")
 //	new_tuple($$, v_text, "statement_type", "select_statement");
 //	tuple_append($$, v_tuple, "select_statement", $1);
     } 
@@ -227,6 +229,7 @@ select_list_item:
 u_select_list_item:
     scalar_expr
     {
+log.Printf("PARSER: scalar_expr %+v", $1)
 //	new_tuple($$, v_sexpr, "value", $1);	
     }
     |
