@@ -143,6 +143,7 @@ log.Printf("Token >>%s<< is an identifier")
 func (x *exprLex) lexpoint() {
 log.Printf("Entering Lexpoint")
 	x.typ = POINT
+	x.consume()
 	return
 }
 
