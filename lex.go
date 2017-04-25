@@ -47,7 +47,7 @@ func (x *exprLex) lexdquote() {
 	x.typ = IDENTIFIER
 
 	for {
-	  n := x.next()
+	  n,_ := x.next()
 	  if n == '"' {
 	    if x.peek() != '"' {
 	      return
@@ -64,7 +64,7 @@ func (x *exprLex) lexsquote() {
 	x.typ = STRING
 
 	for {
-	  n := x.next()
+	  n,_ := x.next()
 	  if n == '\'' {
 	    if x.peek() != '\'' {
 	      return
@@ -81,7 +81,7 @@ log.Printf("Entering lexnumber()")
 	x.typ = NUMERIC
 
 	for {
-	  n := x.next()
+	  n,_ := x.next()
 	  if unicode.IsDigit(n) != true && n != '.' {
 log.Printf("Not a digit or dot")
 	  //here we have encountered a rune that is not
@@ -117,7 +117,7 @@ func (x *exprLex) lextext() {
 	x.typ = IDENTIFIER
 
 	for {
-	  n := x.next()
+	  n,_ := x.next()
 	  if ! isAlphaNumeric(n) {
 	  //here we have encountered the end of the token. 
 	  //determine if it is a keyword.
@@ -152,15 +152,22 @@ func (x *exprLex) lexterm() {
 }
 
 // Return the next rune for the lexer.
-func (x *exprLex) next() rune {
+func (x *exprLex) next() (rune, int) {
 
 	r, w := utf8.DecodeRuneInString(x.line[x.pos:])
+	if w == 0 {
+		log.Printf("NO MORE RUNES!!!")
+		return eof, 0
+	} else {
 	x.pos = x.pos + w
-	return r
+	return r,w
+	}
 }
 
 // Return the current token
 func (x *exprLex) emit() string {
+log.Printf("Entering emit()")
+log.Printf("len: %d tok: %d pos: %d\n", len(x.line), x.tok, x.pos)
 
 	if (x.pos - 1 > len(x.line)) {
 		return ""
@@ -177,11 +184,12 @@ func (x *exprLex) shift() {
 
 // The parser calls this method to get each new token.
 func (x *exprLex) Lex(yylval *exprSymType) int {
+log.Printf("=====================")
 log.Printf("Entering Lex function")
 	//This is called either at the very beginning of the 
 	//string to be parsed or at the start of a new 
 	//token
-	n := x.next()
+	n, _ := x.next()
 
 log.Printf("Next rune is: %c",n)
 	switch {
