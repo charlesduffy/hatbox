@@ -114,7 +114,7 @@ func (x *exprLex) lextext() {
 // set for a keyword or an identifier.
 // The accepted set is:
 // a-zA-Z0-9_
-	x.typ = IDENTIFIER
+log.Printf("Entering lextext")
 
 	for {
 	  n,_ := x.next()
@@ -125,8 +125,12 @@ func (x *exprLex) lextext() {
 
 log.Printf("Token is: >>%s<<\n", o)
 	    if l, ok := SQLkeys[strings.ToLower(o)]; ok {
+log.Printf("Matched token >>%s<< to keyword value %d", o, l)
 	      x.typ = l
-	    }
+	    } else {
+log.Printf("Token >>%s<< is an identifier")
+		x.typ = IDENTIFIER
+	   }
 	    return
 	  }
 	}
@@ -136,17 +140,28 @@ log.Printf("Token is: >>%s<<\n", o)
 // will be a delimiter between table / column 
 // identifiers
 func (x *exprLex) lexpoint() {
+log.Printf("Entering Lexpoint")
+	x.typ = POINT
+	return
+}
 
+// Lex a comma. Delimiter between 
+// select list items or table expression
+// items.
+func (x *exprLex) lexcomma() {
+log.Printf("Entering Lexcomma")
+	x.typ =  COMMA
+	return
 }
 
 // Lex an operator. An operator is one or more
 // characters from the list of:
 // + - * / % ! =
 func (x *exprLex) lexoper() {
-
 }
 
 func (x *exprLex) lexterm() {
+log.Printf("Entering Lexterm")
 	x.typ = SEMICOLON
 	return
 }
@@ -204,14 +219,17 @@ log.Printf("Found EOF")
 		x.lexsquote()
 	  case n >= '0' && n <= '9':
 		x.lexnumber()
-	  case n == '_' || unicode.IsLetter(n):
-		//Here we could match an identifier or a 
-		//keyword
-		x.lextext()
 	  case n == '.':
 		x.lexpoint()
 	  case n == ';':
 		x.lexterm()
+	  case n == ',':
+		x.lexcomma()
+	  case n == '_' || unicode.IsLetter(n):
+		//Here we could match an identifier or a 
+		//keyword
+		//could be sensitive to order in switch stmt
+		x.lextext()
 	  default:
 		x.lexoper()
 	}

@@ -244,6 +244,7 @@ u_select_list_item:
 select_statement:
     SELECT select_list table_expr
     {
+log.Printf("PARSER: I found a select stmt!")
 //	new_tuple($$, v_tuple, "select_list", $2);
 //	tuple_append($$, v_tuple, "table_expr", $3);
     }
@@ -296,6 +297,7 @@ table_ref_list:
 from_clause:
     FROM table_ref_list
     {
+log.Printf("PARSER: I found a from clause!!")
 //	$$=$2;
     }
 ;
@@ -636,6 +638,7 @@ colref:
 	{ 
 //                new_tuple($$,v_text,"class","identifier");  
 //		tuple_append($$, v_text, "value", $1);
+	log.Printf("Parser: I found an Identifier!!")
 	}
 	|
 	IDENTIFIER POINT IDENTIFIER  
