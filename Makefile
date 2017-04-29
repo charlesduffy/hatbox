@@ -2,13 +2,22 @@ define keyword_preamble
 package main\nvar SQLkeys = map[string]int{
 endef
 
-GOYACC=$$GOPATH/src/golang.org/x/tools/cmd/goyacc/goyacc
+define nodetypes_preamble
+package main\nconst (\n
+endef
 
-parser: lex.go y.go keywords.go
-	go build -o parser lex.go y.go keywords.go
+GOYACC=$$GOPATH/src/golang.org/x/tools/cmd/goyacc/goyacc
+PARSER=lex.go y.go keywords.go nodetypes.go
+
+parser: $(PARSER)
+	go build -o parser $(PARSER)
+#TODO use proper Makefile macros here for target / deps
 
 y.go:	gram.y
 	$(GOYACC) -p "expr" gram.y
+
+#Below we have some extremely crude metaprogramming
+#which absolutely has to be replaced
 
 keywords.go: gram.y
 	#produce the keywords map 
@@ -22,7 +31,14 @@ keywords.go: gram.y
 	awk '/^\%token <keyword>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\": %s,\n",tolower($$i),toupper($$i)}}' gram.y >> keywords.go
 	echo "\n}" >> keywords.go
 
+nodetypes.go: gram.y
+	#produce the node types const
+	#========================
+	echo "$(nodetypes_preamble)" > nodetypes.go
+	awk '/^\%type <Tuple>/ {for (i=3;i<=NF;i++) { printf "\t%s\n",$$i} }' gram.y >> nodetypes.go
+	echo "\n)" >> nodetypes.go
+	
 .PHONY: clean
 
 clean:
-	rm -f keywords.go y.go
+	rm -f keywords.go y.go nodetypes.go parser y.output
