@@ -6,22 +6,10 @@ import "log"
 
 %}
 
-/* parser options 
-
-%define api.pure full
-%lex-param {yyscan_t scanner}
-%parse-param {yyscan_t scanner} {tuple * ptree}
-
-%locations */
-
 %union 
 {
-//integer_val	 int
-tokval	 string
-//text_val	 string
-//float_val	 string
-//keyword_val	 string
-//identifier_val string
+	node	pnode
+	value	datum
 }
 
 /*
@@ -78,15 +66,17 @@ tokval	 string
 %left 		AS
 
 %token FOOBAR
+%start sql
+%type <pnode>	query_statement select_statement select_list u_select_list_item select_list_item table_ref
+%type <pnode>	table_ref_list value_expr colref table_expr
+%type <pnode>	function case_expr case_expr_when_list case_expr_when from_clause 
+%type <pnode>	order_by_list order_by_list_item order_by_clause
+%type <pnode>	column_definition column_definition_list data_type insert_statement insert_value_list column_list
+%type <pnode>	ddl_table_ref create_table_stmt drop_table_stmt in_predicate
 
-%type <Tuple>	sql query_statement select_statement select_list u_select_list_item select_list_item table_ref
-%type <Tuple>	table_ref_list value_expr colref table_expr
-%type <Tuple>	function case_expr case_expr_when_list case_expr_when from_clause 
-%type <Tuple>	order_by_list order_by_list_item order_by_clause
-%type <Tuple>	column_definition column_definition_list data_type insert_statement insert_value_list column_list
-%type <Tuple>	ddl_table_ref create_table_stmt drop_table_stmt in_predicate
-
-%type <sExpr>	scalar_expr group_by_clause having_clause where_clause 
+/* These emit expr structures. Review this */
+%type <value>	group_by_clause having_clause where_clause 
+%type <value> 	scalar_expr 
 
 %type <keyword>	order_by_direction order_by_nulls boolean sqlval
 
@@ -205,6 +195,7 @@ select_list:
     select_list_item
     {
 //	new_tuple($$, v_tuple, "select_list_item", $1);
+	log.Printf("PARSER: select_list_item: %+v", $1)
     }
     |
     select_list COMMA select_list_item

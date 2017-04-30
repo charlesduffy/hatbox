@@ -7,7 +7,7 @@ package main\nconst (\n
 endef
 
 GOYACC=$$GOPATH/src/golang.org/x/tools/cmd/goyacc/goyacc
-PARSER=lex.go y.go keywords.go nodetypes.go
+PARSER=lex.go y.go keywords.go nodetypes.go parsetree.go
 
 parser: $(PARSER)
 	go build -o parser $(PARSER)
