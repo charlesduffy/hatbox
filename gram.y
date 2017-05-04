@@ -9,7 +9,7 @@ import "log"
 %union 
 {
 	tokval	datum
-	node	pnode
+	node	[]pnode
 }
 
 /*
@@ -65,8 +65,8 @@ import "log"
 %left           POINT
 %left 		AS
 
-%token FOOBAR
 %start sql
+
 %type <node>	query_statement select_statement select_list u_select_list_item select_list_item table_ref
 %type <node>	table_ref_list value_expr colref table_expr
 %type <node>	function case_expr case_expr_when_list case_expr_when from_clause 
@@ -89,18 +89,6 @@ import "log"
  */
 
 
-/*
-
-	Crazy idea number 5F: instead of dynamically growing the final parse tree (or
-		using some sort of optimisation, like a pre-allocated buffer which we
-		expand if necessary), we just buffer up all the smaller pieces of each 
-		clause in a temporary variable, then create the parent clause at the end, 
-		discarding the temp buffer. 
-
-	Or we could just use "append"...https://blog.golang.org/go-slices-usage-and-internals
-
-*/
-
 sql:
     query_statement SEMICOLON
     {
@@ -112,13 +100,20 @@ sql:
 	$$->list.next = NULL;	
 	$$->list.prev = NULL;	
 */
-	log.Printf("PARSER: query_statement SEMICOLON")
+
+	// Assign query_statement to the first parse node in ParseTree
+	Parsetree.tree = make([]pnode, 1)
+	Parsetree.tree = $1	
+
+	log.Printf("PARSER: query_statement SEMICOLON %+v", Parsetree)
+	
     }
     |
     sql query_statement SEMICOLON
     {
 	log.Printf("PARSER: sql query_statement SEMICOLON")
 //	tuple_append(ptree , v_tuple, "query", $2);
+	//Parsetree.tree = append(Parsetree.tree, $2)
     }
 ;
 
@@ -128,9 +123,13 @@ query_statement:
 	log.Printf("PARSER: select_statement")
 //	new_tuple($$, v_text, "statement_type", "select_statement");
 //	tuple_append($$, v_tuple, "select_statement", $1);
+	$$ = make([]pnode, 1)
+	$$[0].tree = $1
+	// replace this with a method on pnode
+	// $$.addnode($1)
     } 
     |
-    insert_statement	
+    insert_statement
     { 
 //	new_tuple($$, v_text, "statement_type", "insert_statement");
 //	tuple_append($$, v_tuple, "insert_statement", $1);
@@ -239,8 +238,15 @@ select_statement:
     SELECT select_list table_expr
     {
 log.Printf("PARSER: I found a select stmt!")
+	$$ = make([]pnode, 2)
+	$$[0].tag = 7 //change to select_list
+	$$[0].tree = $2
+	$$[1].tag = 8 //change to table_expr
+	$$[1].tree = $3
 //	new_tuple($$, v_tuple, "select_list", $2);
 //	tuple_append($$, v_tuple, "table_expr", $3);
+	
+	
     }
 ;
 

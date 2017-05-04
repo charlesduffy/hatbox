@@ -28,7 +28,7 @@ type ptree struct {
 // Parse tree node
 type pnode struct {
 	tag	nodetype
-	subtree []pnode
+	tree []pnode
 	value	datum
 }
 

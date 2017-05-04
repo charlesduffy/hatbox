@@ -11,6 +11,10 @@ import (	"log"
 
 const eof = 0
 
+// Global parse tree. There's got to be 
+// a better way. 
+var Parsetree ptree
+
 // The parser uses the type <prefix>Lex as a lexer.  It must provide
 // the methods Lex(*<prefix>SymType) int and Error(string).
 type exprLex struct {
@@ -366,5 +370,7 @@ func main() {
                 }
 
                 exprParse(&exprLex{line: string(line)})
+
+		log.Printf("Parse tree is: %+v", Parsetree)
         }
 }
