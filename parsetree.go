@@ -1,5 +1,5 @@
 package main
-import "fmt"
+//import "fmt"
 
 //Parse tree node types enumeration
 //TODO: figure out a way to encapsualte this in 
@@ -24,9 +24,6 @@ type ptree struct {
 // Datum interface
 // Need to add some methods here 
 // but leave it blank for the time being
-type datum interface {
-
-}
 
 // Parse tree node
 type pnode struct {

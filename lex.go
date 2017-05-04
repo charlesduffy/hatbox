@@ -21,6 +21,17 @@ type exprLex struct {
 	width		int			//width of rune
 }
 
+// This interface is for the token value 
+// inside yylval. 
+
+type datum interface {
+
+}
+
+// Eventually we will define methods on the Datum
+// interface to transform string token values
+// to internal types.
+
 func (x *exprLex) peek() rune {
         if len(x.line) < 1 {
                 return 0
@@ -78,30 +89,30 @@ func (x *exprLex) lexsquote() {
 // start of a number. 
 // Try to lex a numeric literal 
 func (x *exprLex) lexnumber() {
-log.Printf("Entering lexnumber()")
+//log.Printf("Entering lexnumber()")
 	x.typ = NUMERIC
 
 	for {
 	  n := x.next()
 	  if unicode.IsDigit(n) != true && n != '.' {
-log.Printf("Not a digit or dot")
+//log.Printf("Not a digit or dot")
 	  //here we have encountered a rune that is not
 	  //accepted within a numeric token. 
 
-log.Printf("Peek character is: >>%c<<", n)
+//log.Printf("Peek character is: >>%c<<", n)
 
 	    if  isOperator(n) || n == ';'|| isWhitespace(n) {
-	     p:=x.emit() //just for debug
-log.Printf("Token is: >>%s<<\n", p)
+	     //p:=x.emit() //just for debug
+//log.Printf("Token is: >>%s<<\n", p)
 	     return
-log.Printf("after return???")
+//log.Printf("after return???")
 	    } else {
 	       //raise error. 
 	    x.Error(x.line)
 	    return
 	    }
 	  }
-log.Printf("Another numeric rune...")
+//log.Printf("Another numeric rune...")
 	}
 
 }
@@ -115,7 +126,7 @@ func (x *exprLex) lextext() {
 // set for a keyword or an identifier.
 // The accepted set is:
 // a-zA-Z0-9_
-log.Printf("Entering lextext")
+//log.Printf("Entering lextext")
 
 	for {
 	  n := x.next()
@@ -124,12 +135,12 @@ log.Printf("Entering lextext")
 	  //determine if it is a keyword.
 	    o := x.emit()
 
-log.Printf("Token is: >>%s<<\n", o)
+//log.Printf("Token is: >>%s<<\n", o)
 	    if l, ok := SQLkeys[strings.ToLower(o)]; ok {
-log.Printf("Matched token >>%s<< to keyword value %d", o, l)
+//log.Printf("Matched token >>%s<< to keyword value %d", o, l)
 	      x.typ = l
 	    } else {
-log.Printf("Token >>%s<< is an identifier")
+//log.Printf("Token >>%s<< is an identifier")
 		x.typ = IDENTIFIER
 	   }
 	    return
@@ -141,7 +152,7 @@ log.Printf("Token >>%s<< is an identifier")
 // will be a delimiter between table / column 
 // identifiers
 func (x *exprLex) lexpoint() {
-log.Printf("Entering Lexpoint")
+//log.Printf("Entering Lexpoint")
 	x.typ = POINT
 	x.consume()
 	return
@@ -151,7 +162,7 @@ log.Printf("Entering Lexpoint")
 // select list items or table expression
 // items.
 func (x *exprLex) lexcomma() {
-log.Printf("Entering Lexcomma")
+//log.Printf("Entering Lexcomma")
 	x.typ =  COMMA
 	x.consume()
 	return
@@ -164,7 +175,7 @@ func (x *exprLex) lexoper() {
 }
 
 func (x *exprLex) lexterm() {
-log.Printf("Entering Lexterm")
+//log.Printf("Entering Lexterm")
 	x.typ = SEMICOLON
 	x.consume()
 	return
@@ -173,8 +184,8 @@ log.Printf("Entering Lexterm")
 //func get tok
 //get the 'current' token
 func (x *exprLex) gettok() (rune, int) {
-log.Printf("Entering gettok() %s", x.line[x.pos:])
-	x.ptok()
+//log.Printf("Entering gettok() %s", x.line[x.pos:])
+	//x.ptok()
 
 	if (x.tok == x.pos && x.pos == len(x.line) - 1) {
 		//end of the line
@@ -183,7 +194,7 @@ log.Printf("Entering gettok() %s", x.line[x.pos:])
 
 	r, w := utf8.DecodeRuneInString(x.line[x.pos:])
 	if w == 0 {
-		log.Printf("NO MORE RUNES!!!")
+		//log.Printf("NO MORE RUNES!!!")
 		return eof, 0
 	} else {
 	return r,w
@@ -194,7 +205,7 @@ log.Printf("Entering gettok() %s", x.line[x.pos:])
 //func curr
 //wrapper around get current
 func (x *exprLex) curr() (rune) {
-log.Printf("Entering curr()")
+//log.Printf("Entering curr()")
 	r,w := x.gettok()
 	x.width = w
 	return r
@@ -207,7 +218,7 @@ log.Printf("Entering curr()")
 
 // Return the next rune for the lexer.
 func (x *exprLex) next() (rune) {
-log.Printf("Entering next()")
+//log.Printf("Entering next()")
 	x.pos = x.pos + x.width
 	r,w := x.gettok()
 	x.width = w
@@ -236,11 +247,11 @@ func (x *exprLex) ptok() {
 
 // Return the current token
 func (x *exprLex) emit() string {
-log.Printf("Entering emit()")
-log.Printf("len: %d tok: %d pos: %d\n", len(x.line), x.tok, x.pos)
+//log.Printf("Entering emit()")
+//log.Printf("len: %d tok: %d pos: %d\n", len(x.line), x.tok, x.pos)
 
 	if (x.pos >= len(x.line)) {
-log.Printf("Emit() says, token zero length, pos at EOL")
+//log.Printf("Emit() says, token zero length, pos at EOL")
 		return ""
 	}
 	r := x.line[x.tok:x.pos]
@@ -255,59 +266,59 @@ func (x *exprLex) shift() {
 
 // The parser calls this method to get each new token.
 func (x *exprLex) Lex(yylval *exprSymType) int {
-log.Printf("=====================")
-log.Printf("Entering Lex function")
+//log.Printf("=====================")
+//log.Printf("Entering Lex function")
 	//This is called either at the very beginning of the 
 	//string to be parsed or at the start of a new 
 	//token
 	L:
 	n := x.curr()
 
-log.Printf("Next rune is: %c",n)
+//log.Printf("Next rune is: %c",n)
 	switch {
 	  case n == '\n':
-log.Printf("short circuit eof")
+//log.Printf("short circuit eof")
 		return eof
 	  case n == eof:
-log.Printf("Found EOF")
+//log.Printf("Found EOF")
 		return eof
 	  case n == ' ' || n == '\n':
-log.Printf("Found space");
+//log.Printf("Found space");
 		x.consume()
 		goto L
 	  case n == '"':
-log.Printf("Found double quote")
+//log.Printf("Found double quote")
 		x.lexdquote()
 	  case n == '\'':
-log.Printf("Found single quote")
+//log.Printf("Found single quote")
 		x.lexsquote()
 	  case n >= '0' && n <= '9':
-log.Printf("Found digit")
+//log.Printf("Found digit")
 		x.lexnumber()
 	  case n == '.':
-log.Printf("Found point")
+//log.Printf("Found point")
 		x.lexpoint()
 	  case n == ';':
-log.Printf("Found semicolon")
+//log.Printf("Found semicolon")
 		x.lexterm()
 	  case n == ',':
-log.Printf("Found comma")
+//log.Printf("Found comma")
 		x.lexcomma()
 	  case n == '_' || unicode.IsLetter(n):
-log.Printf("Found text")
+//log.Printf("Found text")
 		//Here we could match an identifier or a 
 		//keyword
 		//could be sensitive to order in switch stmt
 		x.lextext()
 	  default:
-log.Printf("Found default oper")
+//log.Printf("Found default oper")
 		x.lexoper()
 	}
-	log.Printf("Lexer: %+v\n", x)
+	//log.Printf("Lexer: %+v\n", x)
 
 	yylval.tokval = x.emit()
 	x.shift()
-log.Printf("Lexed token! yylval: %s toktyp: %d", yylval.tokval, x.typ)
+//log.Printf("Lexed token! yylval: %s toktyp: %d", yylval.tokval, x.typ)
 	return x.typ
 }
 

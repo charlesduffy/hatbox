@@ -8,8 +8,8 @@ import "log"
 
 %union 
 {
+	tokval	datum
 	node	pnode
-	value	datum
 }
 
 /*
@@ -67,16 +67,16 @@ import "log"
 
 %token FOOBAR
 %start sql
-%type <pnode>	query_statement select_statement select_list u_select_list_item select_list_item table_ref
-%type <pnode>	table_ref_list value_expr colref table_expr
-%type <pnode>	function case_expr case_expr_when_list case_expr_when from_clause 
-%type <pnode>	order_by_list order_by_list_item order_by_clause
-%type <pnode>	column_definition column_definition_list data_type insert_statement insert_value_list column_list
-%type <pnode>	ddl_table_ref create_table_stmt drop_table_stmt in_predicate
+%type <node>	query_statement select_statement select_list u_select_list_item select_list_item table_ref
+%type <node>	table_ref_list value_expr colref table_expr
+%type <node>	function case_expr case_expr_when_list case_expr_when from_clause 
+%type <node>	order_by_list order_by_list_item order_by_clause
+%type <node>	column_definition column_definition_list data_type insert_statement insert_value_list column_list
+%type <node>	ddl_table_ref create_table_stmt drop_table_stmt in_predicate
 
 /* These emit expr structures. Review this */
-%type <value>	group_by_clause having_clause where_clause 
-%type <value> 	scalar_expr 
+%type <tokval>	group_by_clause having_clause where_clause 
+%type <tokval> 	scalar_expr 
 
 %type <keyword>	order_by_direction order_by_nulls boolean sqlval
 
