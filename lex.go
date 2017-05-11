@@ -28,7 +28,7 @@ type exprLex struct {
 // This interface is for the token value 
 // inside yylval. 
 
-type datum interface {
+type datumval interface {
 
 }
 

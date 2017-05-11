@@ -8,8 +8,8 @@ import "log"
 
 %union 
 {
-	tokval	datum
-	node	[]pnode
+	tokval	datumval
+	node	Pnode
 }
 
 /*
@@ -102,8 +102,8 @@ sql:
 */
 
 	// Assign query_statement to the first parse node in ParseTree
-	Parsetree.tree = make([]pnode, 1)
-	Parsetree.tree = $1	
+	//Parsetree.tree = make([]pnode, 1)
+	Parsetree.tree = append(Parsetree.tree,$1)	
 
 	log.Printf("PARSER: query_statement SEMICOLON %+v", Parsetree)
 	
@@ -123,8 +123,11 @@ query_statement:
 	log.Printf("PARSER: select_statement")
 //	new_tuple($$, v_text, "statement_type", "select_statement");
 //	tuple_append($$, v_tuple, "select_statement", $1);
-	$$ = make([]pnode, 1)
-	$$[0].tree = $1
+	$$ = Pnode{ 
+		   tag: 1, 
+		  }
+	//$$[0].tree = $1
+	$$.tree = append($$.tree, $1)
 	// replace this with a method on pnode
 	// $$.addnode($1)
     } 
@@ -238,11 +241,13 @@ select_statement:
     SELECT select_list table_expr
     {
 log.Printf("PARSER: I found a select stmt!")
-	$$ = make([]pnode, 2)
-	$$[0].tag = 7 //change to select_list
-	$$[0].tree = $2
-	$$[1].tag = 8 //change to table_expr
-	$$[1].tree = $3
+	$$ = Pnode { tag: 999 }
+	//$$[0].tag = 7 //change to select_list
+	//$$[0].tree = $2
+	//$$[1].tag = 8 //change to table_expr
+	//$$[1].tree = $3
+	$$.tree = append($$.tree, $2)
+	$$.tree = append($$.tree, $3)
 //	new_tuple($$, v_tuple, "select_list", $2);
 //	tuple_append($$, v_tuple, "table_expr", $3);
 	
