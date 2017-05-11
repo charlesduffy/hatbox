@@ -35,7 +35,7 @@ nodetypes.go: gram.y
 	#produce the node types const
 	#========================
 	echo "$(nodetypes_preamble)" > nodetypes.go
-	awk '/^\%type <Tuple>/ {for (i=3;i<=NF;i++) { printf "\t%s\n",$$i} }' gram.y >> nodetypes.go
+	awk '/^\%type <node>/ {for (i=3;i<=NF;i++) { printf "\t%s\n",$$i} }' gram.y >> nodetypes.go
 	echo "\n)" >> nodetypes.go
 	
 .PHONY: clean

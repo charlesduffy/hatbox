@@ -121,33 +121,22 @@ query_statement:
     select_statement 
     { 
 	log.Printf("PARSER: select_statement")
-//	new_tuple($$, v_text, "statement_type", "select_statement");
-//	tuple_append($$, v_tuple, "select_statement", $1);
 	$$ = Pnode{ 
 		   tag: 1, 
 		  }
-	//$$[0].tree = $1
-	$$.tree = append($$.tree, $1)
-	// replace this with a method on pnode
-	// $$.addnode($1)
+	$$.append_node($1)
     } 
     |
     insert_statement
     { 
-//	new_tuple($$, v_text, "statement_type", "insert_statement");
-//	tuple_append($$, v_tuple, "insert_statement", $1);
     } 
     |
     create_table_stmt
     {
-//	new_tuple($$, v_text, "statement_type", "create_table_statement");
-//	tuple_append($$, v_tuple, "create_table_statement", $1);
     }
     |
     drop_table_stmt
     {
-//	new_tuple($$, v_text, "statement_type", "drop_table_statement");
-//	tuple_append($$, v_tuple, "drop_table_statement", $1);
     }
 ;
 
@@ -196,20 +185,21 @@ insert_value_list:
 select_list:
     select_list_item
     {
-//	new_tuple($$, v_tuple, "select_list_item", $1);
 	log.Printf("PARSER: select_list_item: %+v", $1)
+	$$ = Pnode{ tag: select_list }
+	$$.append_node($1)
     }
     |
     select_list COMMA select_list_item
     { 
-//	tuple_append($$,v_tuple, "select_list_item", $3);
+	$$.append_node($3)
     } 
 ;
 
 select_list_item:
     u_select_list_item
     {
-//	$$=$1;
+	$$=$1;
     }
     |
     u_select_list_item AS IDENTIFIER

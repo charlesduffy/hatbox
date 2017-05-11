@@ -39,9 +39,7 @@ type datum struct {
 	dtype	datumtype
 }
 
-// Create a parse node
-func new_node() ([]Pnode) {
-
-  return make([]Pnode, 1)
+func (p *Pnode) append_node(n Pnode) {
+	p.tree = append(p.tree, n)
 }
 
