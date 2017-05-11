@@ -8,8 +8,10 @@ import "log"
 
 %union 
 {
-	tokval	datumval
-	node	Pnode
+	tokval		datumval
+	node		Pnode
+	sexpr		Expr
+	identifier_val	string
 }
 
 /*
@@ -76,7 +78,7 @@ import "log"
 
 /* These emit expr structures. Review this */
 %type <tokval>	group_by_clause having_clause where_clause 
-%type <tokval> 	scalar_expr 
+%type <sexpr> 	scalar_expr 
 
 %type <keyword>	order_by_direction order_by_nulls boolean sqlval
 
@@ -204,7 +206,8 @@ select_list_item:
     |
     u_select_list_item AS IDENTIFIER
     {
-//	$$=$1;
+	$$=$1;
+	$$.append_node(make_identifier($3))
 //	tuple_append($$, v_text, "alias", $3); 
     }
 ;
@@ -213,7 +216,10 @@ u_select_list_item:
     scalar_expr
     {
 log.Printf("PARSER: scalar_expr %+v", $1)
-//	new_tuple($$, v_sexpr, "value", $1);	
+	$$=Pnode{
+		  tag: scalar_expr,
+		  val: $1,
+		} 
     }
     |
     MUL

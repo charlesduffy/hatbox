@@ -31,14 +31,14 @@ keywords.go: gram.y
 	awk '/^\%token <keyword>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\": %s,\n",tolower($$i),toupper($$i)}}' gram.y >> keywords.go
 	echo "\n}" >> keywords.go
 
-nodetypes.go: gram.y
+#nodetypes.go: gram.y
 	#produce the node types const
 	#========================
-	echo "$(nodetypes_preamble)" > nodetypes.go
-	awk '/^\%type <node>/ {for (i=3;i<=NF;i++) { printf "\t%s\n",$$i} }' gram.y >> nodetypes.go
-	echo "\n)" >> nodetypes.go
+#	echo "$(nodetypes_preamble)" > nodetypes.go
+#	awk '/^\%type <node>/ {for (i=3;i<=NF;i++) { printf "\t%s\n",$$i} }' gram.y >> nodetypes.go
+#	echo "\n)" >> nodetypes.go
 	
 .PHONY: clean
 
 clean:
-	rm -f keywords.go y.go nodetypes.go parser y.output
+	rm -f keywords.go y.go parser y.output

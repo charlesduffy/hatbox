@@ -29,5 +29,6 @@ const (
 	create_table_stmt
 	drop_table_stmt
 	in_predicate
-
+	identifier
+	scalar_expr
 )

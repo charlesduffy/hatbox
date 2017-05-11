@@ -25,7 +25,7 @@ type Pnode struct {
 
 // Expression tree
 type Expr struct {
-	data	datum
+	data	Datum
 	left	*Expr
 	right	*Expr
 }
@@ -34,7 +34,7 @@ type Expr struct {
 // Need to add some methods here 
 // but leave it blank for the time being
 
-type datum struct {
+type Datum struct {
 	value	datumval
 	dtype	datumtype
 }
@@ -43,3 +43,14 @@ func (p *Pnode) append_node(n Pnode) {
 	p.tree = append(p.tree, n)
 }
 
+func make_identifier(i string) Pnode {
+	return Pnode{
+		tag: identifier,
+		val: Expr{
+			data: Datum{
+				value: i,
+				dtype: IDENTIFIER,
+			},
+		},
+	}
+}
