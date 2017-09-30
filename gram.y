@@ -251,6 +251,18 @@ log.Printf("PARSER: I found a select stmt!")
     }
 ;
 
+/* UPDATE 
+ * ----------------------------------------------------------------------------
+ * Update statement 
+ */
+
+/* DELETE
+ * ----------------------------------------------------------------------------
+ * Delete statement 
+ */
+
+
+
 table_ref:
     IDENTIFIER
     {
