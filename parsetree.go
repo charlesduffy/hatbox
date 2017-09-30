@@ -23,7 +23,7 @@ type ptree struct {
 type Pnode struct {
 	tag	int
 	tree	[]Pnode
-	val	Expr
+	val	*Expr
 }
 
 // Expression tree
@@ -46,23 +46,28 @@ func (p *Pnode) append_node(n Pnode) {
 	p.tree = append(p.tree, n)
 }
 
-func make_identifier(i string) Pnode {
-	return Pnode{
-		tag: identifier,
-		val: Expr{
-			data: Datum{
+func make_identifier(i string) Datum {
+	return Datum{
 				value: i,
-				dtype: IDENTIFIER,
-			},
-		},
-	}
+				dtype: IDENTIFIER}
 }
+
+
+func make_scalar_expr(d Datum, l *Expr , r *Expr) *Expr {
+	return &Expr{
+			data: d,
+			left: l,
+			right: r}
+}
+
 
 func Walk_ptree(t ptree) {
 	for _ , p := range t.tree {
 	  p.walk_pnode()
 	}
 }
+
+type userfunc func(Pnode)
 
 func (t Pnode) walk_pnode() {
 
@@ -76,7 +81,8 @@ func (t Pnode) walk_pnode() {
 		}
 
 	}
-	log.Printf("Node: %s \n" , exprTokname(p.tag));
+	//print the current node
+	log.Printf(" %+v", t)
 }
 
 

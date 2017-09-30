@@ -132,6 +132,7 @@ func (x *exprLex) lextext() {
 	      x.typ = l
 	    } else {
 		x.typ = IDENTIFIER
+		log.Printf("lexer: IDENTIFIER: %s", o)
 	   }
 	    return
 	  }
@@ -275,6 +276,9 @@ func (x *exprLex) Lex(yylval *exprSymType) int {
 
 	yylval.tokval = x.emit()
 	x.shift()
+
+	log.Printf("Lexer: Token text is: %v token type is: %d", yylval.tokval, x.typ)
+
 	return x.typ
 }
 
@@ -323,7 +327,7 @@ func main() {
 
                 exprParse(&exprLex{line: string(line)})
 
-//		log.Printf("Parse tree is: %+v", Parsetree)
+		log.Printf("Parse tree is: %+v", Parsetree)
 		//log.Printf("woooo %s\n", exprTokname(29))
 		Walk_ptree(Parsetree)
 

@@ -10,8 +10,8 @@ import "log"
 {
 	tokval		datumval
 	node		Pnode
-	sexpr		Expr
-	identifier_val	string
+	sexpr		*Expr
+	datum		Datum
 }
 
 /*
@@ -68,9 +68,9 @@ import "log"
 %left 		AS
 
 %start sql
-
+/* The integer value of the token names start from zero (with query_statement)  */
 %type <node>	query_statement select_statement select_list u_select_list_item select_list_item table_ref
-%type <node>	table_ref_list value_expr colref table_expr
+%type <node>	table_ref_list table_expr
 %type <node>	function case_expr case_expr_when_list case_expr_when from_clause 
 %type <node>	order_by_list order_by_list_item order_by_clause
 %type <node>	column_definition column_definition_list data_type insert_statement insert_value_list column_list
@@ -80,9 +80,13 @@ import "log"
 %type <tokval>	group_by_clause having_clause where_clause 
 %type <sexpr> 	scalar_expr 
 
+%type <datum>	value_expr colref
+
 %type <keyword>	order_by_direction order_by_nulls boolean sqlval
 
-%token  <identifier_val>  IDENTIFIER 
+%token  <tokval>  IDENTIFIER 
+
+
 
 %%
 /* SQL
@@ -106,8 +110,9 @@ sql:
 	// Assign query_statement to the first parse node in ParseTree
 	//Parsetree.tree = make([]pnode, 1)
 	Parsetree.tree = append(Parsetree.tree,$1)	
+	log.Printf("EXPRN: %d", exprn)
 
-	log.Printf("PARSER: query_statement SEMICOLON %+v", Parsetree)
+	//log.Printf("PARSER: query_statement SEMICOLON %+v", Parsetree)
 	
     }
     |
@@ -123,9 +128,10 @@ query_statement:
     select_statement 
     { 
 	log.Printf("PARSER: select_statement")
+	//log.Printf("EXPRN: select_statement %d", exprn)
 	$$ = Pnode{ 
-		   tag: 1, 
-		  }
+		   tag: query_statement, 
+		   val: nil}
 	$$.append_node($1)
     } 
     |
@@ -188,7 +194,8 @@ select_list:
     select_list_item
     {
 	log.Printf("PARSER: select_list_item: %+v", $1)
-	$$ = Pnode{ tag: select_list }
+	$$ = Pnode{ tag: select_list,
+		    val: nil}
 	$$.append_node($1)
     }
     |
@@ -202,12 +209,15 @@ select_list_item:
     u_select_list_item
     {
 	$$=$1;
+	log.Printf("IDENTIFIER: %d", exprn)
+	log.Printf("u_select_list_item: %+v", $1)
     }
     |
     u_select_list_item AS IDENTIFIER
     {
 	$$=$1;
-	$$.append_node(make_identifier($3))
+	log.Printf("IDENTIFIER: %d", exprn)
+	//$$.append_node(make_identifier($3))
 //	tuple_append($$, v_text, "alias", $3); 
     }
 ;
@@ -218,8 +228,7 @@ u_select_list_item:
 log.Printf("PARSER: scalar_expr %+v", $1)
 	$$=Pnode{
 		  tag: scalar_expr,
-		  val: $1,
-		} 
+		  val: $1} 
     }
     |
     MUL
@@ -236,18 +245,13 @@ log.Printf("PARSER: scalar_expr %+v", $1)
 select_statement:
     SELECT select_list table_expr
     {
-log.Printf("PARSER: I found a select stmt!")
-	$$ = Pnode { tag: 999 }
-	//$$[0].tag = 7 //change to select_list
-	//$$[0].tree = $2
-	//$$[1].tag = 8 //change to table_expr
-	//$$[1].tree = $3
+	$$ = Pnode { tag: select_statement,
+		     val: nil}
+log.Printf("PARSER: I found a select stmt! %+v", $$)
+log.Printf("PARSER: I found a select stmt! value of select statement is %d", table_ref)
+	
 	$$.tree = append($$.tree, $2)
 	$$.tree = append($$.tree, $3)
-//	new_tuple($$, v_tuple, "select_list", $2);
-//	tuple_append($$, v_tuple, "table_expr", $3);
-	
-	
     }
 ;
 
@@ -440,12 +444,7 @@ EXPRESSIONS
 scalar_expr:
     value_expr
     { 
-//	$$ = MAKENODE(s_expr);
-//	$$->value = $1;
-//	$$->left = NULL;
-//	$$->right = NULL;
-//	$$->list.next = NULL;
-//	$$->list.prev = NULL;
+	$$ = make_scalar_expr($1, nil, nil)
     }
     |
     LPAREN scalar_expr RPAREN
@@ -548,7 +547,9 @@ scalar_expr:
 value_expr:
 	colref
 	{ 
-//	    $$=$1;
+	log.Printf("PARSER: value_expr->Found colref %+v", $1)
+	    $$=$1;
+	log.Printf("PARSER: value_expr->Found colref %+v", $$)
 	}
 	|
 	boolean
@@ -652,7 +653,18 @@ colref:
 //                new_tuple($$,v_text,"class","identifier");  
 //		tuple_append($$, v_text, "value", $1);
 	log.Printf("Parser: I found an Identifier!!")
+	//log.Printf("IDENTIFIER: exprn %d", exprn)
+	//log.Printf("IDENTIFIER: exprnt %d", exprnt)
+	log.Printf("IDENTIFIER: node value %s", $1) 
+	//log.Printf("IDENTIFIER: parent node value %v", $$)
+	log.Printf("------")
+	$$ = Datum{
+		value: $1,
+		dtype: IDENTIFIER}
+
+	log.Printf("IDENTIFIER: Datum is: %+v", $$)
 	}
+
 	|
 	IDENTIFIER POINT IDENTIFIER  
 	{
