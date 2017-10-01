@@ -82,7 +82,9 @@ func (t Pnode) walk_pnode() {
 
 	}
 	//print the current node
-	log.Printf(" %+v", t)
+	log.Printf("%s %d %+v ",typName(t.tag), t.tag, t.val)
 }
 
-
+func typName(t int) string {
+	return NodeYNames[t]
+}

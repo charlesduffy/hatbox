@@ -6,6 +6,10 @@ define nodetypes_preamble
 package main\nconst (\n
 endef
 
+define nodenames_preamble
+var NodeYNames = []string{\n
+endef
+
 GOYACC=$$GOPATH/src/golang.org/x/tools/cmd/goyacc/goyacc
 PARSER=lex.go y.go keywords.go nodetypes.go parsetree.go
 
@@ -31,12 +35,16 @@ keywords.go: gram.y
 	awk '/^\%token <keyword>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\": %s,\n",tolower($$i),toupper($$i)}}' gram.y >> keywords.go
 	echo "\n}" >> keywords.go
 
-#nodetypes.go: gram.y
+nodetypes.go: gram.y
 	#produce the node types const
 	#========================
-#	echo "$(nodetypes_preamble)" > nodetypes.go
-#	awk '/^\%type <node>/ {for (i=3;i<=NF;i++) { printf "\t%s\n",$$i} }' gram.y >> nodetypes.go
-#	echo "\n)" >> nodetypes.go
+	echo "$(nodetypes_preamble)" > nodetypes.go
+	awk '/^\%type <node>/ {for (i=3;i<=NF;i++) { printf "\t%s\n",$$i} }' gram.y >> nodetypes.go
+	echo "\n)" >> nodetypes.go
+
+	echo "\n$(nodenames_preamble)" >> nodetypes.go
+	awk '/^\%type <node>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\",\n",$$i} }' gram.y >> nodetypes.go
+	echo "\n}" >> nodetypes.go
 	
 .PHONY: clean
 
