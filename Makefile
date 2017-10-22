@@ -11,7 +11,7 @@ var NodeYNames = []string{\n
 endef
 
 GOYACC=$$GOPATH/src/golang.org/x/tools/cmd/goyacc/goyacc
-PARSER=lex.go y.go keywords.go nodetypes.go parsetree.go
+PARSER=lex.go y.go keywords.go nodetypes.go parsetree.go structures.go
 
 parser: $(PARSER)
 	go build -o parser $(PARSER)
