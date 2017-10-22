@@ -88,3 +88,26 @@ func (t Pnode) walk_pnode() {
 func typName(t int) string {
 	return NodeYNames[t]
 }
+
+func (t Pnode) getRangeTable() RangeTable {
+
+// 1. make a new empty RangeTable
+// 2. traverse the parse tree until we get to the from_clause
+// 3. iterate over the table_ref objects in the from_clause
+// 4. for each table_ref object, make a TRange and Append() it 
+//    to the RangeTable
+// 5. When we're finished, return the RangeTable
+
+}
+
+func (t Pnode) getSelection() SelectionTable {
+
+}
+
+func (t Pnode) getProjection() ProjectionTable {
+
+}
+
+
+
+
