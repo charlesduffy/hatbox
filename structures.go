@@ -14,9 +14,9 @@ package main
 // internally just about everywhere, including as the 
 // basic item transmitted 
 type Tuple struct {
-	data	[]Datum
+	data	[]Datum	
 	dtypes	[]datumtype
-	dnames  []datumname
+//	dnames  []datumname
 	width	int
 }
 
@@ -53,3 +53,17 @@ type TSelection struct {
 					//which applies to just the relation referred to in 
 					//planId
 }
+
+type SelectionTable []TSelection
+
+// Projection table
+// list of projections for the whole query,
+// that is the "select list"
+
+type TProjection struct {
+	proj	[]Expr
+	ord	int
+}
+
+type ProjectionTable []TProjection
+

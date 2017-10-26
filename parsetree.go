@@ -97,15 +97,17 @@ func (t Pnode) getRangeTable() RangeTable {
 // 4. for each table_ref object, make a TRange and Append() it 
 //    to the RangeTable
 // 5. When we're finished, return the RangeTable
-
+return nil
 }
 
 func (t Pnode) getSelection() SelectionTable {
 
+return nil
 }
 
 func (t Pnode) getProjection() ProjectionTable {
 
+return nil
 }
 
 
