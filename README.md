@@ -1,2 +1,2 @@
-# catena
+# Hatbox
 SQL on blockchain
