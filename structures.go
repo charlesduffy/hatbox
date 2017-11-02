@@ -14,7 +14,7 @@ package main
 // internally just about everywhere, including as the 
 // basic item transmitted 
 type Tuple struct {
-	data	[]Datum	
+	data	[]Datum
 	dtypes	[]datumtype
 //	dnames  []datumname
 	width	int

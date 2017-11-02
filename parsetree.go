@@ -67,7 +67,9 @@ func Walk_ptree(t ptree) {
 	}
 }
 
-type userfunc func(Pnode)
+type PUserFunc func(Pnode) Pnode
+
+
 
 func (t Pnode) walk_pnode() {
 
@@ -89,9 +91,15 @@ func typName(t int) string {
 	return NodeYNames[t]
 }
 
+
+//This gets the list of tables that we need to scan from. 
+//Produces a table with relation catalogue name , schema name , 
+//relation name , alias , projection list
+
 func (t Pnode) getRangeTable() RangeTable {
 
 // 1. make a new empty RangeTable
+	var rt := make(RangeTable)
 // 2. traverse the parse tree until we get to the from_clause
 // 3. iterate over the table_ref objects in the from_clause
 // 4. for each table_ref object, make a TRange and Append() it 
@@ -109,7 +117,4 @@ func (t Pnode) getProjection() ProjectionTable {
 
 return nil
 }
-
-
-
 
