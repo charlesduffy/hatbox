@@ -108,7 +108,7 @@ func typName(t int) string {
 
 func (t Pnode) getRangeTable() RangeTable {
 
-	var f = func( l Pnode)(bool,Pnode){
+	var f = func(l Pnode)(bool,Pnode){
 		log.Print("calling func\n")
 		log.Printf("fn: current pnode: %s %d %+v ",typName(l.tag), l.tag, l.val)
 		return false,Pnode{}

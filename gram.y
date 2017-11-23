@@ -270,32 +270,41 @@ log.Printf("PARSER: I found a select stmt! value of select statement is %d", tab
 table_ref:
     IDENTIFIER
     {
-//	new_tuple($$, v_text, "name", $1);
+	$$ = Pnode { tag: table_ref,
+		     val: &Expr{
+				data: Datum {
+					value: $1,
+					dtype: IDENTIFIER},
+			},
+		    }
+				
     }
     |
     IDENTIFIER IDENTIFIER
     {
-//	new_tuple($$, v_text, "name", $1);
-//	tuple_append($$, v_text, "alias", $2);
+	// TODO: add "alias" element to property hash
+	$$ = Pnode { tag: table_ref,
+		     val: &Expr{
+				data: Datum {
+					value: $1,
+					dtype: IDENTIFIER},
+			},
+		    }
     }
     |
     IDENTIFIER AS IDENTIFIER
     {
-//	new_tuple($$, v_text, "name", $1);
-//	tuple_append($$, v_text, "alias", $3);
+	// Identifier with alias specified via AS
     }
     |
-    LPAREN select_statement RPAREN
+    LPAREN select_statement RPAREN IDENTIFIER
     {
-//	new_tuple($$, v_text, "name", "subquery");
-//	tuple_append($$, v_tuple, "subquery", $2);
+	// Subquery as source table
     }
     |
     LPAREN select_statement RPAREN AS IDENTIFIER
     {
-//	new_tuple($$, v_text, "name", "subquery");
-//	tuple_append($$, v_text, "alias", $5);
-//	tuple_append($$, v_tuple, "subquery", $2);
+	// Subquery as source table
     }
 ;
 
@@ -303,11 +312,15 @@ table_ref_list:
     table_ref
     {
 //	new_tuple($$, v_tuple, "table", $1);
+	$$ = Pnode { tag: table_ref_list,
+		     val: nil}
+	$$.tree = append($$.tree, $1)
     }
     |
     table_ref_list COMMA table_ref
     {
 //	tuple_append($$,v_tuple, "table", $3);	
+	$$.tree = append($$.tree, $3)
     }
 ;
 
@@ -315,7 +328,9 @@ from_clause:
     FROM table_ref_list
     {
 log.Printf("PARSER: I found a from clause!!")
-//	$$=$2;
+	$$ = Pnode { tag: from_clause,
+		     val: nil}
+	$$.tree = append($$.tree, $2)
     }
 ;
 
@@ -425,6 +440,10 @@ group_by_clause:
 table_expr:
     from_clause where_clause group_by_clause having_clause order_by_clause
     {
+	$$ = Pnode { tag: table_expr,
+		     val: nil}
+	$$.tree = append($$.tree, $1)
+
 //	new_tuple($$, v_tuple, "from_clause", $1);
 //	if ($2 != NULL) tuple_append($$, v_sexpr, "where_clause", $2); 
 //	if ($3 != NULL) tuple_append($$, v_sexpr, "group_by_clause", $3); 

@@ -1,5 +1,6 @@
 package main
 const (
+
 	query_statement = iota
 	select_statement
 	select_list
@@ -27,6 +28,7 @@ const (
 	drop_table_stmt
 	in_predicate
 	scalar_expr
+
 )
 
 var NodeYNames = []string{
@@ -58,4 +60,5 @@ var NodeYNames = []string{
 	"drop_table_stmt",
 	"in_predicate",
 	"scalar_expr",
+
 }
