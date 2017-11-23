@@ -328,8 +328,10 @@ func main() {
                 exprParse(&exprLex{line: string(line)})
 
 		log.Printf("Parse tree is: %+v", Parsetree)
+		log.Printf("ok, calling get_rangetable")
+		Parsetree.tree[0].getRangeTable()
 		//log.Printf("woooo %s\n", exprTokname(29))
-		Walk_ptree(Parsetree)
+		//Walk_ptree(Parsetree)
 
         }
 }

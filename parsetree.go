@@ -61,30 +61,40 @@ func make_scalar_expr(d Datum, l *Expr , r *Expr) *Expr {
 }
 
 
-func Walk_ptree(t ptree) {
-	for _ , p := range t.tree {
-	  p.walk_pnode()
-	}
-}
+//func Walk_ptree(t ptree) {
+//	for _ , p := range t.tree {
+//	  p.walk_pnode()
+//	}
+//}
 
-type PUserFunc func(Pnode) Pnode
+type PUserFunc func(Pnode) (bool, Pnode)
 
-
-
-func (t Pnode) walk_pnode() {
+func (t Pnode) walk_pnode(fn PUserFunc, depth int) (bool, Pnode) {
 
 	//traverse 'tree' slice left-depth first
+	log.Printf("Entering walk_pnode %d %s %d %+v ",depth, typName(t.tag), t.tag, t.val)
 	var p Pnode
+
+	ret , q := fn(t)
+	if ( ret == true ) {
+		 return true, q
+	}
 
 	if (t.tree != nil) {
 		for _ , p = range t.tree {
 
-			p.walk_pnode()
-		}
+			ret , q = p.walk_pnode(fn, depth+1)
 
+			if (ret == true) {
+				return true, q
+			}
+		}
 	}
+
+
 	//print the current node
-	log.Printf("%s %d %+v ",typName(t.tag), t.tag, t.val)
+	return false, q
+
 }
 
 func typName(t int) string {
@@ -98,14 +108,21 @@ func typName(t int) string {
 
 func (t Pnode) getRangeTable() RangeTable {
 
+	var f = func( l Pnode)(bool,Pnode){
+		log.Print("calling func\n")
+		log.Printf("fn: current pnode: %s %d %+v ",typName(l.tag), l.tag, l.val)
+		return false,Pnode{}
+	}
 // 1. make a new empty RangeTable
-	var rt := make(RangeTable)
+	rt := make(RangeTable, 5)
 // 2. traverse the parse tree until we get to the from_clause
+	_, a := t.walk_pnode(f,0)
+	log.Printf("%+v\n", a)
 // 3. iterate over the table_ref objects in the from_clause
 // 4. for each table_ref object, make a TRange and Append() it 
 //    to the RangeTable
 // 5. When we're finished, return the RangeTable
-return nil
+return rt
 }
 
 func (t Pnode) getSelection() SelectionTable {
