@@ -90,17 +90,25 @@ func (t Pnode) walk_pnode(fn PUserFunc, depth int) (bool, Pnode) {
 			}
 		}
 	}
-
-
 	//print the current node
 	return false, q
-
 }
 
 func typName(t int) string {
 	return NodeYNames[t]
 }
 
+// For a Pnode that holds a single identifier, return it as string
+
+func (t Pnode) getIdent() string {
+return "foobar"
+}
+
+// For a Pnode that has an alias, return it as a string
+
+func (t Pnode) getIdentAlias() string {
+return "foobalias"
+}
 
 //This gets the list of tables that we need to scan from. 
 //Produces a table with relation catalogue name , schema name , 
@@ -108,16 +116,29 @@ func typName(t int) string {
 
 func (t Pnode) getRangeTable() RangeTable {
 
-	var f = func(l Pnode)(bool,Pnode){
-		log.Print("calling func\n")
-		log.Printf("fn: current pnode: %s %d %+v ",typName(l.tag), l.tag, l.val)
+// 1. declare a new RangeTable
+	var rt RangeTable
+	var planid int
+
+	planid = 0
+
+	var f = func(l Pnode)(bool,Pnode) {
+
+		if (l.tag == table_ref) {
+			rt = append(rt, TRange{
+						catId: 0,
+						planId: planid,
+						physName: l.getIdent(),
+						relName:  l.getIdent(),
+						schemaName: "public",
+						aliasName: l.getIdentAlias()})
+		}
+		planid += 1
 		return false,Pnode{}
 	}
-// 1. make a new empty RangeTable
-	rt := make(RangeTable, 5)
-// 2. traverse the parse tree until we get to the from_clause
-	_, a := t.walk_pnode(f,0)
-	log.Printf("%+v\n", a)
+	t.walk_pnode(f,0)
+
+	log.Printf("range table is: %+v", rt)
 // 3. iterate over the table_ref objects in the from_clause
 // 4. for each table_ref object, make a TRange and Append() it 
 //    to the RangeTable
@@ -135,3 +156,14 @@ func (t Pnode) getProjection() ProjectionTable {
 return nil
 }
 
+// Walk parse tree for debugging purposes
+func (t Pnode) walkParseTree() {
+
+	var f = func(l Pnode)(bool,Pnode){
+		log.Print("calling func\n")
+		log.Printf("fn: current pnode: %s %d %+v ",typName(l.tag), l.tag, l.val)
+		return false,Pnode{}
+	}
+	_, a := t.walk_pnode(f,0)
+	log.Printf("%+v\n", a)
+}

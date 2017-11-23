@@ -33,7 +33,7 @@ type TRange struct {
 	planId		int		//plan-specific ID, generated during planning
 	physName	string		//name of the relation "on disk" 
 	relName		string		//name of the relation from the catalogue
-	schemaName	string		//name of the relation from the catalogue
+	schemaName	string		//name of the schema relation is in 
 	aliasName	string		//alias of the relation, provided in query
 
 }
