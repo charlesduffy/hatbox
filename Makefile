@@ -13,8 +13,8 @@ endef
 GOYACC=$$GOPATH/src/golang.org/x/tools/cmd/goyacc/goyacc
 PARSER=lex.go y.go keywords.go nodetypes.go parsetree.go structures.go
 
-parser: $(PARSER)
-	go build -o parser $(PARSER)
+hb: $(PARSER)
+	go build -o hb $(PARSER)
 #TODO use proper Makefile macros here for target / deps
 
 y.go:	gram.y
@@ -35,7 +35,7 @@ keywords.go: gram.y
 	awk '/^\%token <keyword>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\": %s,\n",tolower($$i),toupper($$i)}}' gram.y >> keywords.go
 	echo "\n}" >> keywords.go
 
-nodetypes.go: gram.y
+nodetypes.go: 
 	#produce the node types const
 	#========================
 	echo "$(nodetypes_preamble)" > nodetypes.go
@@ -49,4 +49,4 @@ nodetypes.go: gram.y
 .PHONY: clean
 
 clean:
-	rm -f keywords.go y.go parser y.output
+	rm -f keywords.go y.go hb y.output
