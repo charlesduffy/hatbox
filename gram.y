@@ -209,25 +209,20 @@ select_list_item:
     u_select_list_item
     {
 	$$=$1;
-	log.Printf("IDENTIFIER: %d", exprn)
-	log.Printf("u_select_list_item: %+v", $1)
     }
     |
     u_select_list_item AS IDENTIFIER
     {
+	//TODO: incorporate Alias code
 	$$=$1;
-	log.Printf("IDENTIFIER: %d", exprn)
-	//$$.append_node(make_identifier($3))
-//	tuple_append($$, v_text, "alias", $3); 
     }
 ;
 
 u_select_list_item:
     scalar_expr
     {
-log.Printf("PARSER: scalar_expr %+v", $1)
 	$$=Pnode{
-		  tag: scalar_expr,
+		  tag: select_list_item,
 		  val: $1} 
     }
     |
@@ -282,7 +277,6 @@ table_ref:
     |
     IDENTIFIER IDENTIFIER
     {
-	// TODO: add "alias" element to property hash
 	$$ = Pnode { tag: table_ref,
 		     val: &Expr{
 				data: Datum {
@@ -290,16 +284,27 @@ table_ref:
 					dtype: IDENTIFIER},
 			},
 		    }
+	$$.addAttr(att_alias,$2)
     }
     |
     IDENTIFIER AS IDENTIFIER
     {
-	// Identifier with alias specified via AS
+	$$ = Pnode { tag: table_ref,
+		     val: &Expr{
+				data: Datum {
+					value: $1,
+					dtype: IDENTIFIER},
+			},
+		    }
+	$$.addAttr(att_alias,$3)
     }
     |
     LPAREN select_statement RPAREN IDENTIFIER
     {
 	// Subquery as source table
+	$$.tree = append($$.tree, $2)
+	$$.addAttr(att_alias,$4)
+	$$.addAttr(att_subq,true)
     }
     |
     LPAREN select_statement RPAREN AS IDENTIFIER
