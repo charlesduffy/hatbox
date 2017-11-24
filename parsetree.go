@@ -49,7 +49,7 @@ type Datum struct {
 	dtype	datumtype
 }
 
-func (p *Pnode) append_node(n Pnode) {
+func (p *Pnode) appendNode(n Pnode) {
 	p.tree = append(p.tree, n)
 }
 
@@ -62,14 +62,14 @@ func (p *Pnode) addAttr(att int , val interface{}) {
 	p.attr[att] = val
 }
 
-func make_identifier(i string) Datum {
+func makeIdentifier(i string) Datum {
 	return Datum{
 				value: i,
 				dtype: IDENTIFIER}
 }
 
 
-func make_scalar_expr(d Datum, l *Expr , r *Expr) *Expr {
+func makeScalarExpr(d Datum, l *Expr , r *Expr) *Expr {
 	return &Expr{
 			data: d,
 			left: l,
@@ -78,10 +78,10 @@ func make_scalar_expr(d Datum, l *Expr , r *Expr) *Expr {
 
 type PUserFunc func(Pnode) (bool, Pnode)
 
-func (t Pnode) walk_pnode(fn PUserFunc, depth int) (bool, Pnode) {
+func (t Pnode) walkPnode(fn PUserFunc, depth int) (bool, Pnode) {
 
 	//traverse 'tree' slice left-depth first
-	log.Printf("Entering walk_pnode %d %s %d %+v ",depth, typName(t.tag), t.tag, t.val)
+	log.Printf("Entering walkPnode %d %s %d %+v ",depth, typName(t.tag), t.tag, t.val)
 	var p Pnode
 
 	ret , q := fn(t)
@@ -92,7 +92,7 @@ func (t Pnode) walk_pnode(fn PUserFunc, depth int) (bool, Pnode) {
 	if (t.tree != nil) {
 		for _ , p = range t.tree {
 
-			ret , q = p.walk_pnode(fn, depth+1)
+			ret , q = p.walkPnode(fn, depth+1)
 
 			if (ret == true) {
 				return true, q
@@ -156,7 +156,7 @@ func (t Pnode) getRangeTable() RangeTable {
 		return false,Pnode{}
 	}
 
-	t.walk_pnode(f,0)
+	t.walkPnode(f,0)
 
 	log.Printf("range table is: %+v", rt)
 // 3. iterate over the table_ref objects in the from_clause
@@ -184,6 +184,6 @@ func (t Pnode) walkParseTree() {
 		log.Printf("fn: current pnode: %s %d %+v ",typName(l.tag), l.tag, l.val)
 		return false,Pnode{}
 	}
-	_, a := t.walk_pnode(f,0)
+	_, a := t.walkPnode(f,0)
 	log.Printf("%+v\n", a)
 }

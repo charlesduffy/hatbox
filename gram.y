@@ -132,7 +132,7 @@ query_statement:
 	$$ = Pnode{ 
 		   tag: query_statement, 
 		   val: nil}
-	$$.append_node($1)
+	$$.appendNode($1)
     } 
     |
     insert_statement
@@ -196,12 +196,12 @@ select_list:
 	log.Printf("PARSER: select_list_item: %+v", $1)
 	$$ = Pnode{ tag: select_list,
 		    val: nil}
-	$$.append_node($1)
+	$$.appendNode($1)
     }
     |
     select_list COMMA select_list_item
     { 
-	$$.append_node($3)
+	$$.appendNode($3)
     } 
 ;
 
@@ -468,7 +468,7 @@ EXPRESSIONS
 scalar_expr:
     value_expr
     { 
-	$$ = make_scalar_expr($1, nil, nil)
+	$$ = makeScalarExpr($1, nil, nil)
     }
     |
     LPAREN scalar_expr RPAREN
