@@ -289,6 +289,7 @@ table_ref:
     |
     IDENTIFIER AS IDENTIFIER
     {
+log.Printf("parser: I AS I: %v AS %v", $1, $3);
 	$$ = Pnode { tag: table_ref,
 		     val: &Expr{
 				data: Datum {
@@ -332,7 +333,7 @@ table_ref_list:
 from_clause:
     FROM table_ref_list
     {
-log.Printf("PARSER: I found a from clause!!")
+//log.Printf("PARSER: I found a from clause!!")
 	$$ = Pnode { tag: from_clause,
 		     val: nil}
 	$$.tree = append($$.tree, $2)

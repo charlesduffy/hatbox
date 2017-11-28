@@ -76,7 +76,7 @@ func makeScalarExpr(d Datum, l *Expr , r *Expr) *Expr {
 			right: r}
 }
 
-type PUserFunc func(Pnode) (bool, Pnode)
+type PUserFunc func(Pnode,int) (bool, Pnode)
 
 func (t Pnode) walkPnode(fn PUserFunc, depth int) (bool, Pnode) {
 
@@ -84,7 +84,7 @@ func (t Pnode) walkPnode(fn PUserFunc, depth int) (bool, Pnode) {
 	log.Printf("Entering walkPnode %d %s %d %+v ",depth, typName(t.tag), t.tag, t.val)
 	var p Pnode
 
-	ret , q := fn(t)
+	ret , q := fn(t,depth)
 	if ( ret == true ) {
 		 return true, q
 	}
@@ -129,19 +129,18 @@ func (t Pnode) getIdentAlias() string {
 	}
 }
 
-//This gets the list of tables that we need to scan from. 
+//Gets the list of tables that we need to scan from. 
 //Produces a table with relation catalogue name , schema name , 
 //relation name , alias , projection list
 
 func (t Pnode) getRangeTable() RangeTable {
 
-// 1. declare a new RangeTable
 	var rt RangeTable
 	var planid int
 
 	planid = 0
 
-	var f = func(l Pnode)(bool,Pnode) {
+	var f = func(l Pnode, _ int)(bool,Pnode) {
 
 		if (l.tag == table_ref) {
 			rt = append(rt, TRange{
@@ -151,18 +150,14 @@ func (t Pnode) getRangeTable() RangeTable {
 						relName:  l.getIdent(),
 						schemaName: "public",
 						aliasName: l.getIdentAlias()})
+			planid += 1
 		}
-		planid += 1
 		return false,Pnode{}
 	}
 
 	t.walkPnode(f,0)
 
 	log.Printf("range table is: %+v", rt)
-// 3. iterate over the table_ref objects in the from_clause
-// 4. for each table_ref object, make a TRange and Append() it 
-//    to the RangeTable
-// 5. When we're finished, return the RangeTable
 return rt
 }
 
@@ -179,7 +174,7 @@ return nil
 // Walk parse tree for debugging purposes
 func (t Pnode) walkParseTree() {
 
-	var f = func(l Pnode)(bool,Pnode){
+	var f = func(l Pnode, _ int)(bool,Pnode){
 		log.Print("calling func\n")
 		log.Printf("fn: current pnode: %s %d %+v ",typName(l.tag), l.tag, l.val)
 		return false,Pnode{}

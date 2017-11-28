@@ -333,5 +333,6 @@ func main() {
 		log.Printf("==========================")
 		log.Printf("ok, calling get_rangetable")
 		Parsetree.tree[0].getRangeTable()
+		Parsetree.tree[0].mkdot()
         }
 }
