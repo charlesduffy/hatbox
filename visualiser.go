@@ -12,20 +12,48 @@ type dotNode struct {
 
 type dotLink struct {
 	linkId	int
-	from	string
-	to	string
+	from	int
+	to	int
 }
 
-func (t Pnode) mkdot() ([]dotNode, []dotLink) {
+type dotGraph struct {
+	dn	[]dotNode
+	dl	[]dotLink
+}
+
+func (d dotGraph) drawdot() {
+
+	fmt.Printf("graph \"parsetree\" { node [ fontsize=12 ]; graph [ fontsize=10 ]; label = \"query text goes here\" subgraph parsetree_1 { color=\"blue\" ")
+
+
+	if (d.dn != nil) {
+		for _,p := range d.dn {
+			fmt.Printf("ptree_%0.0d [ label = \"%v\" ];", p.nodeId, p.label);
+		}
+	}
+
+	if (d.dl != nil) {
+		for _,q := range d.dl {
+			fmt.Printf("ptree_%0.0d -- ptree_%0.0d [ id = %d ]", q.from , q.to , q.linkId);
+		}
+	}
+
+	fmt.Printf("} }")
+}
+
+
+func (t Pnode) mkdot() (dotGraph) {
 
 	var dn  []dotNode
 	var dt  []int
 	var dl  []dotLink
 	var nodeid int
+	var linkid int
 	var depth int
 	var parentid int
 
 	nodeid = 1
+	linkid = 1
 
 	var f = func(l Pnode, d int)(bool,Pnode) {
 
@@ -60,13 +88,20 @@ func (t Pnode) mkdot() ([]dotNode, []dotLink) {
 					parentId: parentid,
 					label: fmt.Sprintf("%s", typName(l.tag))})
 
+		dl = append(dl, dotLink{
+					linkId: linkid,
+					from: parentid,
+					to: nodeid})
 
 		nodeid += 1
+		linkid += 1
 		return false,Pnode{}
 	}
 
 	t.walkPnode(f,0)
 
 	log.Printf("node list is: %+v  link list is: %+v ", dn, dl)
-return dn,dl
+return dotGraph{
+		dn,
+		dl}
 }
