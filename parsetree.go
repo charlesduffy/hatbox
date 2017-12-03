@@ -103,6 +103,23 @@ func (t Pnode) walkPnode(fn PUserFunc, depth int) (bool, Pnode) {
 	return false, q
 }
 
+type EUserFunc func(Expr,int) (bool, Expr)
+
+func (e Expr) walkExpr (fn EUserFunc, depth int) (bool, Expr) {
+
+	_, x := fn(e,depth)
+
+	if ( e.left != nil ) {
+		_ , x = e.left.walkExpr(fn, depth+1)
+	}
+
+	if ( e.right != nil ) {
+		_ , x = e.right.walkExpr(fn, depth+1)
+	}
+
+	return false , x
+}
+
 func typName(t int) string {
 	return NodeYNames[t]
 }

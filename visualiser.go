@@ -42,6 +42,14 @@ func (d dotGraph) drawdot() {
 }
 
 
+//Trverse an Expr structure accumulating a
+//dotGraph representing a scalar expression, 
+//and return it
+//func (e Expr) mkdot() (dotGraph) {
+//
+//}
+
+
 func (t Pnode) mkdot() (dotGraph) {
 
 	var dn  []dotNode
