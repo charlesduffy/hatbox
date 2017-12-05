@@ -18,7 +18,7 @@ hb: $(PARSER)
 #TODO use proper Makefile macros here for target / deps
 
 y.go:	gram.y
-	$(GOYACC) -p "expr" gram.y
+	$(GOYACC) -v "parsetable" -p "expr" gram.y
 
 #Below we have some extremely crude metaprogramming
 #which absolutely has to be replaced

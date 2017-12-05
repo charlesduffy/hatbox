@@ -45,10 +45,26 @@ func (d dotGraph) drawdot() {
 //Trverse an Expr structure accumulating a
 //dotGraph representing a scalar expression, 
 //and return it
-//func (e Expr) mkdot() (dotGraph) {
-//
-//}
 
+/*
+func (e Expr) mkdot() (dotGraph) {
+
+	var dn  []dotNode
+	var dt  []int
+	var dl  []dotLink
+	var nodeid int
+	var linkid int
+	var depth int
+	var parentid int
+
+	var f = func(e Expr, d int)(bool, Expr) {
+
+	}
+
+
+
+}
+*/
 
 func (t Pnode) mkdot() (dotGraph) {
 
