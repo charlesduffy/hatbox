@@ -10,7 +10,7 @@ import "log"
 {
 	tokval		datumval
 	node		Pnode
-	sexpr		*Expr
+	sexpr		Pnode
 	datum		Datum
 }
 
@@ -98,40 +98,21 @@ import "log"
 sql:
     query_statement SEMICOLON
     {
-/*
-	$$ = ptree;
-	$$->type = v_tuple;
-	$$->v_tuple = $1;
-	$$->tag = "query";
-	$$->list.next = NULL;	
-	$$->list.prev = NULL;	
-*/
-
 	// Assign query_statement to the first parse node in ParseTree
-	//Parsetree.tree = make([]pnode, 1)
 	Parsetree.tree = append(Parsetree.tree,$1)	
 	log.Printf("EXPRN: %d", exprn)
-
-	//log.Printf("PARSER: query_statement SEMICOLON %+v", Parsetree)
-	
     }
     |
     sql query_statement SEMICOLON
     {
 	log.Printf("PARSER: sql query_statement SEMICOLON")
-//	tuple_append(ptree , v_tuple, "query", $2);
-	//Parsetree.tree = append(Parsetree.tree, $2)
     }
 ;
 
 query_statement:
     select_statement 
     { 
-	log.Printf("PARSER: select_statement")
-	//log.Printf("EXPRN: select_statement %d", exprn)
-	$$ = Pnode{ 
-		   tag: query_statement, 
-		   val: nil}
+	$$ = makeNode(select_statement)
 	$$.appendNode($1)
     } 
     |
@@ -193,9 +174,7 @@ insert_value_list:
 select_list:
     select_list_item
     {
-	log.Printf("PARSER: select_list_item: %+v", $1)
-	$$ = Pnode{ tag: select_list,
-		    val: nil}
+	$$ = makeNode(select_list)
 	$$.appendNode($1)
     }
     |
@@ -221,9 +200,7 @@ select_list_item:
 u_select_list_item:
     scalar_expr
     {
-	$$=Pnode{
-		  tag: select_list_item,
-		  val: $1} 
+	$$ = makeNode(select_list_item)
     }
     |
     MUL
@@ -240,13 +217,9 @@ u_select_list_item:
 select_statement:
     SELECT select_list table_expr
     {
-	$$ = Pnode { tag: select_statement,
-		     val: nil}
-log.Printf("PARSER: I found a select stmt! %+v", $$)
-log.Printf("PARSER: I found a select stmt! value of select statement is %d", table_ref)
-	
-	$$.tree = append($$.tree, $2)
-	$$.tree = append($$.tree, $3)
+	$$ = makeNode(select_statement)
+	$$.appendNode($2)
+	$$.appendNode($3)
     }
 ;
 
@@ -265,47 +238,27 @@ log.Printf("PARSER: I found a select stmt! value of select statement is %d", tab
 table_ref:
     IDENTIFIER
     {
-	$$ = Pnode { tag: table_ref,
-		     val: &Expr{
-				data: Datum {
-					value: $1,
-					dtype: IDENTIFIER},
-			},
-		    }
-				
+	$$ = makeNode(table_ref)
+	$$.addDatum($1, IDENTIFIER)
     }
     |
     IDENTIFIER IDENTIFIER
     {
-	$$ = Pnode { tag: table_ref,
-		     val: &Expr{
-				data: Datum {
-					value: $1,
-					dtype: IDENTIFIER},
-			},
-		    }
+	$$ = makeNode(table_ref)
+	$$.addDatum($1,IDENTIFIER)	
 	$$.addAttr(att_alias,$2)
     }
     |
     IDENTIFIER AS IDENTIFIER
     {
-log.Printf("parser: I AS I: %v AS %v", $1, $3);
-	$$ = Pnode { tag: table_ref,
-		     val: &Expr{
-				data: Datum {
-					value: $1,
-					dtype: IDENTIFIER},
-			},
-		    }
+	$$ = makeNode(table_ref)
+	$$.addDatum($1,IDENTIFIER)	
 	$$.addAttr(att_alias,$3)
     }
     |
     LPAREN select_statement RPAREN IDENTIFIER
     {
 	// Subquery as source table
-	$$.tree = append($$.tree, $2)
-	$$.addAttr(att_alias,$4)
-	$$.addAttr(att_subq,true)
     }
     |
     LPAREN select_statement RPAREN AS IDENTIFIER
@@ -317,26 +270,21 @@ log.Printf("parser: I AS I: %v AS %v", $1, $3);
 table_ref_list:
     table_ref
     {
-//	new_tuple($$, v_tuple, "table", $1);
-	$$ = Pnode { tag: table_ref_list,
-		     val: nil}
-	$$.tree = append($$.tree, $1)
+	$$ = makeNode(table_ref_list)
+	$$.appendNode($1)
     }
     |
     table_ref_list COMMA table_ref
     {
-//	tuple_append($$,v_tuple, "table", $3);	
-	$$.tree = append($$.tree, $3)
+	$$.appendNode($3)
     }
 ;
 
 from_clause:
     FROM table_ref_list
     {
-//log.Printf("PARSER: I found a from clause!!")
-	$$ = Pnode { tag: from_clause,
-		     val: nil}
-	$$.tree = append($$.tree, $2)
+	$$ = makeNode(from_clause)
+	$$.appendNode($2)
     }
 ;
 
@@ -446,15 +394,8 @@ group_by_clause:
 table_expr:
     from_clause where_clause group_by_clause having_clause order_by_clause
     {
-	$$ = Pnode { tag: table_expr,
-		     val: nil}
-	$$.tree = append($$.tree, $1)
-
-//	new_tuple($$, v_tuple, "from_clause", $1);
-//	if ($2 != NULL) tuple_append($$, v_sexpr, "where_clause", $2); 
-//	if ($3 != NULL) tuple_append($$, v_sexpr, "group_by_clause", $3); 
-//	if ($4 != NULL) tuple_append($$, v_sexpr, "having_clause", $4); 
-//	if ($5 != NULL) tuple_append($$, v_tuple, "order_by_clause", $5); 
+	$$ = makeNode(table_expr)
+	$$.appendNode($1)
     }
 ;
 
@@ -469,7 +410,8 @@ EXPRESSIONS
 scalar_expr:
     value_expr
     { 
-	$$ = makeScalarExpr($1, nil, nil)
+	$$ = makeNode(scalar_expr)
+	$$.addDatum0($1)
     }
     |
     LPAREN scalar_expr RPAREN
@@ -480,6 +422,14 @@ scalar_expr:
     scalar_expr ADD scalar_expr 
     {
 //	mk_s_expr_oper($$, "ADD", $1, $3);
+/* according to the new Expr-less parse tree...
+
+   what we do here is the following:
+
+   1. we push ADD to the data attribute of the current Pnode
+   2. we push the LEFTMOST scalar_expr to tree - it becomes tree[0]
+   3. we push the RIGHTMOST scalar_expr to tree - it becomes tree[1]
+*/
     }
     |
     scalar_expr MUL scalar_expr 		

@@ -49,7 +49,7 @@ type RangeTable []TRange
 type TSelection struct {
 
 	planId		int		//the plan ID of the relation this filter applies to
-	selExp		Expr		//an expression extracted from the WHERE clause Expr
+	selExp		Pnode		//an expression extracted from the WHERE clause Expr
 					//which applies to just the relation referred to in 
 					//planId
 }
@@ -61,7 +61,7 @@ type SelectionTable []TSelection
 // that is the "select list"
 
 type TProjection struct {
-	proj	[]Expr
+	proj	[]Pnode
 	ord	int
 }
 

@@ -50,6 +50,8 @@ func (d dotGraph) drawdot() {
 
 //this could be alleviated with some dot language
 //trickery or a wrapper function
+
+/* -- temp hide
 func (e Expr) mkdot(n int, linkId int) (dotGraph) {
 
 	var dn  []dotNode
@@ -115,7 +117,7 @@ return dotGraph{
 
 
 }
-
+*/
 func (t Pnode) mkdot() (dotGraph) {
 
 	var dn  []dotNode
@@ -131,14 +133,6 @@ func (t Pnode) mkdot() (dotGraph) {
 
 	var f = func(l Pnode, d int)(bool,Pnode) {
 
-		var edg = dotGraph{}
-		if (l.val != nil) {
-			log.Printf("found an expr! %+v", l.val)
-			edg = l.val.mkdot(nodeid,linkid)
-			dn = append(dn, edg.dn...)
-			dl = append(dl, edg.dl...)
-			return false,Pnode{}
-		}
 
 		if (d == 0) {
 			dt = append(dt, nodeid)

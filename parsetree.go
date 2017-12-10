@@ -30,14 +30,7 @@ type Pnode struct {
 	tag	int
 	tree	[]Pnode
 	attr	map[int]interface{}
-	val	*Expr
-}
-
-// Expression tree
-type Expr struct {
-	data	Datum
-	left	*Expr
-	right	*Expr
+	dat	Datum
 }
 
 // Datum interface
@@ -53,6 +46,10 @@ func (p *Pnode) appendNode(n Pnode) {
 	p.tree = append(p.tree, n)
 }
 
+func makeNode(n int ) Pnode {
+	return Pnode{ tag: n }
+}
+
 func (p *Pnode) addAttr(att int , val interface{}) {
 
 	if (p.attr == nil) {
@@ -62,18 +59,31 @@ func (p *Pnode) addAttr(att int , val interface{}) {
 	p.attr[att] = val
 }
 
+func (p *Pnode) addDatum(d datumval, t datumtype) {
+	p.dat = Datum{
+			value: d,
+			dtype: t}
+}
+
+func (p *Pnode) addDatum0(d Datum) {
+	p.dat = d
+}
+
+/* --flag for removal
 func makeIdentifier(i string) Datum {
 	return Datum{
 				value: i,
 				dtype: IDENTIFIER}
 }
+*/
 
+func makeScalarExpr(d Datum, l Pnode, r Pnode) Pnode {
 
-func makeScalarExpr(d Datum, l *Expr , r *Expr) *Expr {
-	return &Expr{
-			data: d,
-			left: l,
-			right: r}
+	n := Pnode{tag:scalar_expr}
+	n.dat = d
+	n.appendNode(l)
+	n.appendNode(r)
+	return n
 }
 
 type PUserFunc func(Pnode,int) (bool, Pnode)
@@ -81,7 +91,7 @@ type PUserFunc func(Pnode,int) (bool, Pnode)
 func (t Pnode) walkPnode(fn PUserFunc, depth int) (bool, Pnode) {
 
 	//traverse 'tree' slice left-depth first
-	log.Printf("Entering walkPnode %d %s %d %+v ",depth, typName(t.tag), t.tag, t.val)
+
 	var p Pnode
 
 	ret , q := fn(t,depth)
@@ -99,25 +109,8 @@ func (t Pnode) walkPnode(fn PUserFunc, depth int) (bool, Pnode) {
 			}
 		}
 	}
-	//print the current node
+
 	return false, q
-}
-
-type EUserFunc func(Expr,int) (bool, Expr)
-
-func (e Expr) walkExpr (fn EUserFunc, depth int) (bool, Expr) {
-
-	_, x := fn(e,depth)
-
-	if ( e.left != nil ) {
-		_ , x = e.left.walkExpr(fn, depth+1)
-	}
-
-	if ( e.right != nil ) {
-		_ , x = e.right.walkExpr(fn, depth+1)
-	}
-
-	return false , x
 }
 
 func typName(t int) string {
@@ -125,11 +118,10 @@ func typName(t int) string {
 }
 
 // For a Pnode that holds a single identifier, return it as string
-
 func (t Pnode) getIdent() string {
 
-	if (t.val.data.dtype == IDENTIFIER) {
-		return t.val.data.value.(string)
+	if t.dat.dtype == IDENTIFIER {
+		return t.dat.value.(string)
 	} else {
 		return ""
 	}
@@ -193,7 +185,7 @@ func (t Pnode) walkParseTree() {
 
 	var f = func(l Pnode, _ int)(bool,Pnode){
 		log.Print("calling func\n")
-		log.Printf("fn: current pnode: %s %d %+v ",typName(l.tag), l.tag, l.val)
+		//log.Printf("fn: current pnode: %s %d %+v ",typName(l.tag), l.tag, l.val)
 		return false,Pnode{}
 	}
 	_, a := t.walkPnode(f,0)
