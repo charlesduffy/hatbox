@@ -45,9 +45,24 @@ func (d dotGraph) drawdot() {
 //Trverse an Expr structure accumulating a
 //dotGraph representing a scalar expression, 
 //and return it
-//func (e Expr) mkdot() (dotGraph) {
-//
-//}
+
+//for the time being we accept args for the 
+//initial nodeId and LinkID values
+
+//this could be alleviated with some dot language
+//trickery or a wrapper function
+func (e Expr) mkdot(nodeId int, linkId int) (dotGraph) {
+
+	var dn  []dotNode
+	var dt  []int
+	var dl  []dotLink
+	var nodeid int
+	var linkid int
+	var depth int
+	var parentid int
+
+
+}
 
 
 func (t Pnode) mkdot() (dotGraph) {
@@ -103,6 +118,13 @@ func (t Pnode) mkdot() (dotGraph) {
 
 		nodeid += 1
 		linkid += 1
+
+		//check if we are an Expr node, if so, draw the expression graph
+		if (l.val != nil) {
+			(edn , edl ) := l.val.makedot(nodeid,linkid)
+		}
+
+
 		return false,Pnode{}
 	}
 
