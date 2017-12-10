@@ -51,49 +51,48 @@ func (d dotGraph) drawdot() {
 //this could be alleviated with some dot language
 //trickery or a wrapper function
 
-/* -- temp hide
-func (e Expr) mkdot(n int, linkId int) (dotGraph) {
+
+func (e Pnode) mkdot() (dotGraph) {
 
 	var dn  []dotNode
 	var dt  []int
 	var dl  []dotLink
-	var nodeid int
-	var linkid int
+	var nodeid int = 1
+	var linkid int = 1
 	var depth int
 	var pid int
 
-	nodeid = n
-	linkid = linkId
-
-	var f = func(e Expr, d int)(bool, Expr) {
-
-			log.Printf("in expr processing")
+	var f = func(e Pnode, d int)(bool, Pnode) {
 
 		switch d {
 			case 0:
 				dt = append(dt, nodeid)
-				log.Printf("Expr depth initial: %d %+v", d, e.data )
+				log.Printf("Expr depth initial: %d %+v", d, e.dat)
 				depth = 0
-				pid = n
+				pid = 0
 			case depth+1:
-				pid = n + dt[len(dt)-1]
-				if e.left != nil && e.right != nil {
-					dt = append(dt, n)
+				pid = dt[len(dt)-1]
+
+				if e.tree != nil {
+					dt = append(dt, nodeid)
 				}
+
 				depth = d
 			case depth-1:
 				dt = dt[:len(dt)-1]
 				pid = dt[len(dt)-1]
-				if e.left != nil && e.right != nil {
-					dt = append(dt, n)
+
+				if e.tree != nil {
+					dt = append(dt, nodeid)
 				}
+
 				depth = d
 		}
 
 		dn = append(dn, dotNode{
 					nodeId: nodeid,
 					parentId: pid,
-					label: fmt.Sprintf("EX %+v", e.data)})
+					label: fmt.Sprintf("%s %+v", typName(e.tag), e.dat)})
 
 		dl = append(dl, dotLink{
 					linkId: linkid,
@@ -103,21 +102,19 @@ func (e Expr) mkdot(n int, linkId int) (dotGraph) {
 		nodeid += 1
 		linkid += 1
 
-		return false, Expr{}
+		return false, Pnode{}
 	}
 
-	e.walkExpr(f,0)
+	e.walkPnode(f,0)
 
-
-return dotGraph{
-		dn,
-		dl}
-
-	return dotGraph{ dn, dl}
-
+	return dotGraph{
+			dn,
+			dl}
 
 }
-*/
+
+/*
+
 func (t Pnode) mkdot() (dotGraph) {
 
 	var dn  []dotNode
@@ -183,3 +180,5 @@ return dotGraph{
 		dn,
 		dl}
 }
+
+*/
