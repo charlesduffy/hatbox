@@ -69,13 +69,16 @@ func (p *Pnode) addDatum0(d Datum) {
 	p.dat = d
 }
 
-/* --flag for removal
-func makeIdentifier(i string) Datum {
-	return Datum{
-				value: i,
-				dtype: IDENTIFIER}
+func makeOperScalarExpr(d datumtype, l Pnode, r Pnode) Pnode {
+
+	n := Pnode{tag:scalar_expr,
+		   datum: Datum {
+				value: nil,
+				dtype: d}}
+	n.appendNode(l)
+	n.appendNode(r)
+	return n
 }
-*/
 
 func makeScalarExpr(d Datum, l Pnode, r Pnode) Pnode {
 

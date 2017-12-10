@@ -30,7 +30,7 @@ import "log"
 /* SQL keywords */
 %token <keyword> SELECT INSERT UPDATE DELETE WHERE FROM VALUES CREATE DROP SUM 
 %token <keyword> COUNT SET INTO TABLE WITH ORDER BY HAVING GROUP CASE WHEN THEN END
-%token <keyword> ELSE DESC ASC FIRST LAST NULLS _NULL TRUE FALSE IS NOT UNKNOWN
+%token <keyword> ELSE DESC ASC FIRST LAST NULLS _NULL TRUE FALSE IS UNKNOWN
 
 /* SQL Datatypes */
 
@@ -43,7 +43,7 @@ import "log"
 %token <text_val> STRING 
 
 /* punctuation */
-%token <keyword> QUOTE COMMA NEWLINE 
+%token <keyword> QUOTE NEWLINE 
 
 /* operators */
 
@@ -416,80 +416,73 @@ scalar_expr:
     |
     LPAREN scalar_expr RPAREN
     { 
-//	$$ = $2;
+	$$ = $2;
     }
     |
     scalar_expr ADD scalar_expr 
     {
-//	mk_s_expr_oper($$, "ADD", $1, $3);
-/* according to the new Expr-less parse tree...
-
-   what we do here is the following:
-
-   1. we push ADD to the data attribute of the current Pnode
-   2. we push the LEFTMOST scalar_expr to tree - it becomes tree[0]
-   3. we push the RIGHTMOST scalar_expr to tree - it becomes tree[1]
-*/
+	$$ = makeOperScalarExpr(ADD,$1,$2)
     }
     |
     scalar_expr MUL scalar_expr 		
     {
-//	mk_s_expr_oper($$, "MUL", $1, $3);
+	$$ = makeOperScalarExpr(MUL,$1,$2)
     }
     |
     scalar_expr DIV scalar_expr 		
     {
-//	mk_s_expr_oper($$, "DIV", $1, $3);
+	$$ = makeOperScalarExpr(DIV,$1,$2)
     }
     |
     scalar_expr MOD scalar_expr 		
     {
-//	mk_s_expr_oper($$, "MOD", $1, $3);
+	$$ = makeOperScalarExpr(MOD,$1,$2)
     }
     |
     scalar_expr AND scalar_expr 		
     {
-//	mk_s_expr_oper($$, "AND", $1, $3);
+	$$ = makeOperScalarExpr(AND,$1,$2)
     }
     |
     scalar_expr OR scalar_expr 		
     {
-//	mk_s_expr_oper($$, "OR", $1, $3);
+	$$ = makeOperScalarExpr(OR,$1,$2)
     }
     |
     scalar_expr EQ scalar_expr 		
     {
-//	mk_s_expr_oper($$, "EQ", $1, $3);
+	$$ = makeOperScalarExpr(EQ,$1,$2)
     }
     |
     scalar_expr NE scalar_expr 		 
     {
-//	mk_s_expr_oper($$, "NE", $1, $3);
+	$$ = makeOperScalarExpr(NE,$1,$2)
     }
     |
     scalar_expr GT scalar_expr 		
     {
-//	mk_s_expr_oper($$, "GT", $1, $3);
+	$$ = makeOperScalarExpr(GT,$1,$2)
     }
     |
     scalar_expr LT scalar_expr 		
     {
-//	mk_s_expr_oper($$, "LT", $1, $3);
+	$$ = makeOperScalarExpr(LT,$1,$2)
     }
     |
     scalar_expr GE scalar_expr 		
     {
-//	mk_s_expr_oper($$, "GE", $1, $3);
+	$$ = makeOperScalarExpr(GE,$1,$2)
     }
     |
     scalar_expr LE scalar_expr 	
     {
-//	mk_s_expr_oper($$, "LE", $1, $3);
+	$$ = makeOperScalarExpr(LE,$1,$2)
     }
     |
     scalar_expr SUB scalar_expr 	
     {
 //	mk_s_expr_oper($$, "SUB", $1, $3);
+	$$ = makeOperScalarExpr(ADD,$1,$2)
     }
     |
     scalar_expr IN LPAREN in_predicate RPAREN
