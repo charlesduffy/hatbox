@@ -45,13 +45,12 @@ func (d dotGraph) drawdot() {
 //Trverse an Expr structure accumulating a
 //dotGraph representing a scalar expression, 
 //and return it
-
 //for the time being we accept args for the 
 //initial nodeId and LinkID values
 
 //this could be alleviated with some dot language
 //trickery or a wrapper function
-func (e Expr) mkdot(nodeId int, linkId int) (dotGraph) {
+func (e Expr) mkdot(n int, linkId int) (dotGraph) {
 
 	var dn  []dotNode
 	var dt  []int
@@ -59,11 +58,63 @@ func (e Expr) mkdot(nodeId int, linkId int) (dotGraph) {
 	var nodeid int
 	var linkid int
 	var depth int
-	var parentid int
+	var pid int
+
+	nodeid = n
+	linkid = linkId
+
+	var f = func(e Expr, d int)(bool, Expr) {
+
+			log.Printf("in expr processing")
+
+		switch d {
+			case 0:
+				dt = append(dt, nodeid)
+				log.Printf("Expr depth initial: %d %+v", d, e.data )
+				depth = 0
+				pid = n
+			case depth+1:
+				pid = n + dt[len(dt)-1]
+				if e.left != nil && e.right != nil {
+					dt = append(dt, n)
+				}
+				depth = d
+			case depth-1:
+				dt = dt[:len(dt)-1]
+				pid = dt[len(dt)-1]
+				if e.left != nil && e.right != nil {
+					dt = append(dt, n)
+				}
+				depth = d
+		}
+
+		dn = append(dn, dotNode{
+					nodeId: nodeid,
+					parentId: pid,
+					label: fmt.Sprintf("EX %+v", e.data)})
+
+		dl = append(dl, dotLink{
+					linkId: linkid,
+					from: pid,
+					to: nodeid})
+
+		nodeid += 1
+		linkid += 1
+
+		return false, Expr{}
+	}
+
+	e.walkExpr(f,0)
+
+
+return dotGraph{
+		dn,
+		dl}
+
+	return dotGraph{ dn, dl}
 
 
 }
-
 
 func (t Pnode) mkdot() (dotGraph) {
 
@@ -80,6 +131,14 @@ func (t Pnode) mkdot() (dotGraph) {
 
 	var f = func(l Pnode, d int)(bool,Pnode) {
 
+		var edg = dotGraph{}
+		if (l.val != nil) {
+			log.Printf("found an expr! %+v", l.val)
+			edg = l.val.mkdot(nodeid,linkid)
+			dn = append(dn, edg.dn...)
+			dl = append(dl, edg.dl...)
+			return false,Pnode{}
+		}
 
 		if (d == 0) {
 			dt = append(dt, nodeid)
@@ -120,11 +179,6 @@ func (t Pnode) mkdot() (dotGraph) {
 		linkid += 1
 
 		//check if we are an Expr node, if so, draw the expression graph
-		if (l.val != nil) {
-			(edn , edl ) := l.val.makedot(nodeid,linkid)
-		}
-
-
 		return false,Pnode{}
 	}
 
