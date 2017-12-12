@@ -27,15 +27,16 @@ import "log"
 
 */
 
-/* SQL keywords */
-%token <keyword> SELECT INSERT UPDATE DELETE WHERE FROM VALUES CREATE DROP SUM 
-%token <keyword> COUNT SET INTO TABLE WITH ORDER BY HAVING GROUP CASE WHEN THEN END
-%token <keyword> ELSE DESC ASC FIRST LAST NULLS _NULL TRUE FALSE IS UNKNOWN
 
 /* SQL Datatypes */
 
 %token <keyword> INTEGER BIGINT SMALLINT INT2 INT4 INT8 NUMERIC REAL DOUBLE 
 %token <keyword> BIT DATE TIME TIMESTAMP ZONE INTERVAL PRECISION FLOAT TEXT CHAR VARCHAR
+
+/* SQL keywords */
+%token <keyword> SELECT INSERT UPDATE DELETE WHERE FROM VALUES CREATE DROP SUM 
+%token <keyword> COUNT SET INTO TABLE WITH ORDER BY HAVING GROUP CASE WHEN THEN END
+%token <keyword> ELSE DESC ASC FIRST LAST NULLS _NULL TRUE FALSE IS UNKNOWN
 
 /* Literal values */
 %token <integer_val> INT_LIT
@@ -46,6 +47,9 @@ import "log"
 %token <keyword> QUOTE NEWLINE 
 
 /* operators */
+%token <keyword> ADD SUB MUL DIV MOD EQ NE LT GT LE GE AND OR NOT IN BETWEEN
+
+/* operator precedence */
 
 %left           OR
 %left           AND
@@ -421,68 +425,68 @@ scalar_expr:
     |
     scalar_expr ADD scalar_expr 
     {
-	$$ = makeOperScalarExpr(ADD,$1,$2)
+	//$$ = makeOperScalarExpr(ADD,$1,$2)
     }
     |
     scalar_expr MUL scalar_expr 		
     {
-	$$ = makeOperScalarExpr(MUL,$1,$2)
+	//$$ = makeOperScalarExpr(MUL,$1,$2)
     }
     |
     scalar_expr DIV scalar_expr 		
     {
-	$$ = makeOperScalarExpr(DIV,$1,$2)
+	//$$ = makeOperScalarExpr(DIV,$1,$2)
     }
     |
     scalar_expr MOD scalar_expr 		
     {
-	$$ = makeOperScalarExpr(MOD,$1,$2)
+	//$$ = makeOperScalarExpr(MOD,$1,$2)
     }
     |
     scalar_expr AND scalar_expr 		
     {
-	$$ = makeOperScalarExpr(AND,$1,$2)
+	//$$ = makeOperScalarExpr(AND,$1,$2)
     }
     |
     scalar_expr OR scalar_expr 		
     {
-	$$ = makeOperScalarExpr(OR,$1,$2)
+	//$$ = makeOperScalarExpr(OR,$1,$2)
     }
     |
     scalar_expr EQ scalar_expr 		
     {
-	$$ = makeOperScalarExpr(EQ,$1,$2)
+	//$$ = makeOperScalarExpr(EQ,$1,$2)
     }
     |
     scalar_expr NE scalar_expr 		 
     {
-	$$ = makeOperScalarExpr(NE,$1,$2)
+	//$$ = makeOperScalarExpr(NE,$1,$2)
     }
     |
     scalar_expr GT scalar_expr 		
     {
-	$$ = makeOperScalarExpr(GT,$1,$2)
+	//$$ = makeOperScalarExpr(GT,$1,$2)
     }
     |
     scalar_expr LT scalar_expr 		
     {
-	$$ = makeOperScalarExpr(LT,$1,$2)
+	//$$ = makeOperScalarExpr(LT,$1,$2)
     }
     |
     scalar_expr GE scalar_expr 		
     {
-	$$ = makeOperScalarExpr(GE,$1,$2)
+	//$$ = makeOperScalarExpr(GE,$1,$2)
     }
     |
     scalar_expr LE scalar_expr 	
     {
-	$$ = makeOperScalarExpr(LE,$1,$2)
+	//$$ = makeOperScalarExpr(LE,$1,$2)
     }
     |
     scalar_expr SUB scalar_expr 	
     {
 //	mk_s_expr_oper($$, "SUB", $1, $3);
-	$$ = makeOperScalarExpr(ADD,$1,$2)
+	//$$ = makeOperScalarExpr(ADD,$1,$2)
     }
     |
     scalar_expr IN LPAREN in_predicate RPAREN

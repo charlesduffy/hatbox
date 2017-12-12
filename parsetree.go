@@ -72,7 +72,7 @@ func (p *Pnode) addDatum0(d Datum) {
 func makeOperScalarExpr(d datumtype, l Pnode, r Pnode) Pnode {
 
 	n := Pnode{tag:scalar_expr,
-		   datum: Datum {
+		   dat: Datum {
 				value: nil,
 				dtype: d}}
 	n.appendNode(l)

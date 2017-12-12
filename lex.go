@@ -100,7 +100,7 @@ func (x *exprLex) lexnumber() {
 	  if unicode.IsDigit(n) != true && n != '.' {
 	  //here we have encountered a rune that is not
 	  //accepted within a numeric token. 
-	    if  isOperator(n) || n == ';'|| isWhitespace(n) {
+	    if  isOperChar(n) || n == ';'|| isWhitespace(n) {
 	     return
 	    } else {
 	    x.Error(x.line)
@@ -121,6 +121,10 @@ func (x *exprLex) lextext() {
 // The accepted set is:
 // a-zA-Z0-9_
 
+// TODO: Modify to handle the case where identifiers
+//       may only begin with a particular set of 
+//       characters
+
 	for {
 	  n := x.next()
 	  if ! isAlphaNumeric(n) {
@@ -138,6 +142,54 @@ func (x *exprLex) lextext() {
 	  }
 	}
 }
+
+// Lex an operator. An operator is one or more
+// characters from the list of:
+// + - * / % ! = > <
+//
+// multi-char opers
+// 
+// >= <= != <> 
+
+func (x *exprLex) lexoper() {
+
+	for {
+		n := x.next()
+		if ! isOperChar(n) {
+
+			o := x.emit()
+
+			switch(o) {
+				case "+":
+					x.typ = ADD
+				case "-":
+					x.typ = SUB
+				case "*":
+					x.typ = MUL
+				case "/":
+					x.typ = DIV
+				case "%":
+					x.typ = MOD
+				case "=":
+					x.typ = EQ
+				case ">":
+					x.typ = GT
+				case "<":
+					x.typ = LT
+				case ">=":
+					x.typ = GE
+				case "<=":
+					x.typ = LE
+				case "!=":
+					x.typ = NE
+				case "<>":
+					x.typ = NE
+			}
+			return
+		}
+	}
+}
+
 
 // Lex a point character. In this context it 
 // will be a delimiter between table / column 
@@ -157,11 +209,6 @@ func (x *exprLex) lexcomma() {
 	return
 }
 
-// Lex an operator. An operator is one or more
-// characters from the list of:
-// + - * / % ! =
-func (x *exprLex) lexoper() {
-}
 
 func (x *exprLex) lexterm() {
 	x.typ = SEMICOLON
@@ -265,13 +312,14 @@ func (x *exprLex) Lex(yylval *exprSymType) int {
 		x.lexterm()
 	  case n == ',':
 		x.lexcomma()
+	  case isOperChar(n):
+		//Lex a symbolic operator character
+		x.lexoper()
 	  case n == '_' || unicode.IsLetter(n):
 		//Here we could match an identifier or a 
 		//keyword
 		//could be sensitive to order in switch stmt
 		x.lextext()
-	  default:
-		x.lexoper()
 	}
 
 	yylval.tokval = x.emit()
@@ -296,8 +344,8 @@ func isWhitespace(r rune) bool {
    }
 }
 
-func isOperator(r rune) bool {
-   operchars := "+-/*%!=^~"
+func isOperChar(r rune) bool {
+   operchars := "+-/*%!=^~><"
 
    if strings.IndexRune(operchars, r) == -1 {
      return false

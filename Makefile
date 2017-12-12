@@ -33,7 +33,7 @@ keywords.go: gram.y
 	#constant values stuffed into a map. 
 	echo "$(keyword_preamble)" > keywords.go
 	awk '/^\%token <keyword>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\": %s,\n",tolower($$i),toupper($$i)}}' gram.y >> keywords.go
-	awk '/^\%left|%right|%nonassoc/ {for (i=2;i<=NF;i++) { printf "\t\"%s\": %s,\n",tolower($$i),toupper($$i)}}' gram.y >> keywords.go
+	#awk '/^\%left|%right|%nonassoc/ {for (i=2;i<=NF;i++) { printf "\t\"%s\": %s,\n",tolower($$i),toupper($$i)}}' gram.y >> keywords.go
 	echo "\n}" >> keywords.go
 
 nodetypes.go: 
