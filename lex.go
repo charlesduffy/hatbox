@@ -185,6 +185,7 @@ func (x *exprLex) lexoper() {
 				case "<>":
 					x.typ = NE
 			}
+			log.Printf("lexer: OPER lval: %s toktyp: %d", o, x.typ)
 			return
 		}
 	}
