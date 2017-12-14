@@ -109,7 +109,6 @@ sql:
     {
 	// Assign query_statement to the first parse node in ParseTree
 	Parsetree.tree = append(Parsetree.tree,$1)	
-	log.Printf("EXPRN: %d", exprn)
     }
     |
     sql query_statement SEMICOLON
@@ -121,7 +120,7 @@ sql:
 query_statement:
     select_statement 
     { 
-	$$ = makeNode(select_statement)
+	$$ = makeNode(query_statement)
 	$$.appendNode($1)
     } 
     |
