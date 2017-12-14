@@ -8,6 +8,7 @@ type dotNode struct {
 	nodeId int
 	parentId int
 	label  string
+	tag int
 }
 
 type dotLink struct {
@@ -23,12 +24,19 @@ type dotGraph struct {
 
 func (d dotGraph) drawdot() {
 
+	var attstr string
+
 	fmt.Printf("graph \"parsetree\" { node [ fontsize=12 ]; graph [ fontsize=10 ]; label = \"query text goes here\" subgraph parsetree_1 { color=\"blue\" ")
 
 
 	if (d.dn != nil) {
 		for _,p := range d.dn {
-			fmt.Printf("ptree_%0.0d [ label = \"%v\" ];", p.nodeId, p.label);
+			if (p.tag == scalar_expr) {
+				attstr = "color=deepskyblue shape=egg style=filled"
+			} else {
+				attstr = "color=thistle2 shape=box style=filled"
+			}
+			fmt.Printf("ptree_%0.0d [ label = \"%v\" %s ];", p.nodeId, p.label, attstr);
 		}
 	}
 
@@ -92,7 +100,8 @@ func (e Pnode) mkdot() (dotGraph) {
 		dn = append(dn, dotNode{
 					nodeId: nodeid,
 					parentId: pid,
-					label: fmt.Sprintf("%s %+v", typName(e.tag), e.dat)})
+					label: fmt.Sprintf("tag: %d %s %+v", e.tag, typName(e.tag), e.dat),
+					tag: e.tag})
 
 		dl = append(dl, dotLink{
 					linkId: linkid,
@@ -112,73 +121,3 @@ func (e Pnode) mkdot() (dotGraph) {
 			dl}
 
 }
-
-/*
-
-func (t Pnode) mkdot() (dotGraph) {
-
-	var dn  []dotNode
-	var dt  []int
-	var dl  []dotLink
-	var nodeid int
-	var linkid int
-	var depth int
-	var parentid int
-
-	nodeid = 1
-	linkid = 1
-
-	var f = func(l Pnode, d int)(bool,Pnode) {
-
-
-		if (d == 0) {
-			dt = append(dt, nodeid)
-
-		log.Printf("depth 0 %+v ",typName(l.tag))
-		depth = 0
-		parentid = 0
-		} else if (d == (depth+1)) {
-			parentid = dt[len(dt)-1]
-			if (l.tree != nil) {
-				dt = append(dt, nodeid)
-			}
-			depth = d
-		log.Printf("d %d depth %d %+v ",d,depth, typName(l.tag))
-
-		} else if (d == (depth-1)) {
-			dt = dt[:len(dt)-1]
-			parentid = dt[len(dt)-1]
-			if (l.tree != nil) {
-				dt = append(dt, nodeid)
-			}
-			depth = d
-		log.Printf("d %d %+v ",d,typName(l.tag))
-		}
-
-
-		dn = append(dn, dotNode{
-					nodeId: nodeid,
-					parentId: parentid,
-					label: fmt.Sprintf("%s", typName(l.tag))})
-
-		dl = append(dl, dotLink{
-					linkId: linkid,
-					from: parentid,
-					to: nodeid})
-
-		nodeid += 1
-		linkid += 1
-
-		//check if we are an Expr node, if so, draw the expression graph
-		return false,Pnode{}
-	}
-
-	t.walkPnode(f,0)
-
-	log.Printf("node list is: %+v  link list is: %+v ", dn, dl)
-return dotGraph{
-		dn,
-		dl}
-}
-
-*/

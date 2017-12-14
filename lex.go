@@ -7,6 +7,7 @@ import (	"log"
 		"unicode"
 		"unicode/utf8"
 		"strings"
+		"github.com/davecgh/go-spew/spew"
 )
 
 const eof = 0
@@ -380,6 +381,8 @@ func main() {
 		log.Printf("ok, calling walkParseTree")
 		Parsetree.tree[0].walkParseTree()
 		log.Printf("==========================")
+		log.Printf("visualise with Spew:")
+		spew.Dump(Parsetree)
 		log.Printf("ok, calling get_rangetable")
 		Parsetree.tree[0].getRangeTable()
 		dg := Parsetree.tree[0].mkdot()
