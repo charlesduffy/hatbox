@@ -26,7 +26,9 @@ func (d dotGraph) drawdot() {
 
 	var attstr string
 
-	fmt.Printf("graph \"parsetree\" { node [ fontsize=12 ]; graph [ fontsize=10 ]; label = \"query text goes here\" subgraph parsetree_1 { color=\"blue\" ")
+	fmt.Printf("graph \"parsetree\" {\n")
+	fmt.Printf(" node [ fontsize=11 ]; graph [ fontsize=10 ];\n")
+	fmt.Printf(" subgraph parsetree_1 { color=\"blue\" \n")
 
 
 	if (d.dn != nil) {
@@ -36,17 +38,17 @@ func (d dotGraph) drawdot() {
 			} else {
 				attstr = "color=thistle2 shape=box style=filled"
 			}
-			fmt.Printf("ptree_%0.0d [ label = \"%v\" %s ];", p.nodeId, p.label, attstr);
+			fmt.Printf("ptree_%0.0d [ label = \"%v\" %s ];\n", p.nodeId, p.label, attstr);
 		}
 	}
 
 	if (d.dl != nil) {
 		for _,q := range d.dl {
-			fmt.Printf("ptree_%0.0d -- ptree_%0.0d [ id = %d ]", q.from , q.to , q.linkId);
+			fmt.Printf("ptree_%0.0d -- ptree_%0.0d [ id = %d ]\n", q.from , q.to , q.linkId);
 		}
 	}
 
-	fmt.Printf("} }")
+	fmt.Printf("\t}\n}")
 }
 
 
@@ -72,13 +74,12 @@ func (e Pnode) mkdot() (dotGraph) {
 
 	var f = func(e Pnode, d int)(bool, Pnode) {
 
-		switch d {
-			case 0:
+		switch {
+			case d == 0:
 				dt = append(dt, nodeid)
-				log.Printf("Expr depth initial: %d %+v", d, e.dat)
 				depth = 0
 				pid = 0
-			case depth+1:
+			case d == depth+1:
 				pid = dt[len(dt)-1]
 
 				if e.tree != nil {
@@ -86,8 +87,9 @@ func (e Pnode) mkdot() (dotGraph) {
 				}
 
 				depth = d
-			case depth-1:
-				dt = dt[:len(dt)-1]
+			case d < depth:
+				dd := depth - d
+				dt = dt[:len(dt)-dd]
 				pid = dt[len(dt)-1]
 
 				if e.tree != nil {
