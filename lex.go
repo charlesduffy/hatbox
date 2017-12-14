@@ -78,7 +78,7 @@ func (x *exprLex) lexdquote() {
 // Lex a string literal
 func (x *exprLex) lexsquote() {
 
-	x.typ = STRING
+	x.typ = STRING_LIT
 
 	for {
 	  n := x.next()
@@ -94,7 +94,7 @@ func (x *exprLex) lexsquote() {
 // start of a number. 
 // Try to lex a numeric literal 
 func (x *exprLex) lexnumber() {
-	x.typ = NUMERIC
+	x.typ = NUM_LIT
 
 	for {
 	  n := x.next()

@@ -1,5 +1,4 @@
 package main
-import "log"
 import "fmt"
 
 //visualise a ptree using DOT

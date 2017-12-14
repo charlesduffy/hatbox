@@ -44,9 +44,9 @@ import "log"
 %token <keyword> ELSE DESC ASC FIRST LAST NULLS _NULL TRUE FALSE IS UNKNOWN
 
 /* Literal values */
-%token <integer_val> INT_LIT
-%token <float_val> NUM_LIT
-%token <text_val> STRING 
+%token <tokval> INT_LIT
+%token <tokval> NUM_LIT
+%token <tokval> STRING_LIT
 
 /* punctuation */
 %token <keyword> QUOTE NEWLINE 
@@ -493,7 +493,9 @@ scalar_expr:
     scalar_expr SUB scalar_expr 	
     {
 	$$ = makeOperScalarExpr(ADD,$1,$3)
-    }
+    };
+
+/*
     |
     scalar_expr IN LPAREN in_predicate RPAREN
     {
@@ -521,6 +523,7 @@ scalar_expr:
 //	mk_s_expr_oper($$, "ISNOT", $1, $4);
     }
 ;
+*/
 
 value_expr:
 	colref
@@ -547,10 +550,12 @@ value_expr:
 	|	
 	NUM_LIT 
 	{
-//	    mk_tuplist_lit($$, v_float, "NUM", $1);
+		$$ = Datum{
+				value: $1,
+				dtype: NUM_LIT}
 	}
 	|	
-	STRING
+	STRING_LIT
 	{
 //	    mk_tuplist_lit($$, v_text, "TEXT", $1);
 	}
@@ -628,13 +633,8 @@ case_expr_when:
 colref:
 	IDENTIFIER 
 	{ 
-//                new_tuple($$,v_text,"class","identifier");  
-//		tuple_append($$, v_text, "value", $1);
 	log.Printf("Parser: I found an Identifier!!")
-	//log.Printf("IDENTIFIER: exprn %d", exprn)
-	//log.Printf("IDENTIFIER: exprnt %d", exprnt)
 	log.Printf("IDENTIFIER: node value %s", $1) 
-	//log.Printf("IDENTIFIER: parent node value %v", $$)
 	log.Printf("------")
 	$$ = Datum{
 		value: $1,
