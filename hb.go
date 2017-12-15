@@ -1,5 +1,16 @@
 package main
+//go:generate goyacc -o parser/y.go -p expr parser/gram.y
+//go:generate gofmt -r "main -> parser" -w parser/y.go
 
+import (	"log"
+		"bufio"
+		"os"
+		"io"
+		"github.com/davecgh/go-spew/spew"
+		"github.com/hatbox/parser"
+)
+
+var Parsetree ptree
 func main(){
         in := bufio.NewReader(os.Stdin)
         for {

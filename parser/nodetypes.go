@@ -1,4 +1,4 @@
-package main
+package parser
 const (
 
 	query_statement = iota

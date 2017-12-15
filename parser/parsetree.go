@@ -1,5 +1,6 @@
-package main
-//import "fmt"
+package parser
+
+
 import "log"
 
 //Parse tree node types enumeration
