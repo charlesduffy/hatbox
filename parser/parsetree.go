@@ -2,6 +2,7 @@ package parser
 
 
 import "log"
+import "github.com/hatbox/planner"
 
 //Parse tree node types enumeration
 //TODO: figure out a way to encapsualte this in 

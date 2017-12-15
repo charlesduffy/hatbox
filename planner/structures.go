@@ -1,7 +1,7 @@
-package main
+package planner
 //import "fmt"
 //import "log"
-
+import "github.com/hatbox/parser"
 // Datum name. Usually something like "table"."column"
 // but can be aliased at various stages of execution. 
 
