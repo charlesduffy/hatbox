@@ -47,7 +47,7 @@ func (p *Pnode) appendNode(n Pnode) {
 	p.tree = append(p.tree, n)
 }
 
-func makeNode(n int ) Pnode {
+func makeNode(n int) Pnode {
 	return Pnode{ tag: n }
 }
 

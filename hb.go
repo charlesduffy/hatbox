@@ -1,6 +1,7 @@
 package main
+
 //go:generate goyacc -o parser/y.go -p expr parser/gram.y
-//go:generate gofmt -r "main -> parser" -w parser/y.go
+//go:generate build/mkstructures.sh
 
 import (	"log"
 		"bufio"

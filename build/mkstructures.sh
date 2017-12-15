@@ -6,7 +6,7 @@ N=parser/nodetypes.go
 PKG=parser
 
 KP="package ${PKG}\nvar SQLkeys = map[string]int{"
-NP="package ${PKG}\ntype ParseNode int\n const (\n"
+NP="package ${PKG}\nconst (\n"
 NN="var NodeYNames = []string{\n"
 
 echo -e "$KP" > $K
@@ -14,8 +14,13 @@ awk '/^\%token <keyword>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\": %s,\n",tolowe
 echo -e "\n}" >> $K
 
 #produce the node types const
+#
+#each is the name of a parse tree node pattern defined in the grammar
+#the names are written into integer constants here
+#we get these out of the grammar file itself
+#include everything type 'node' or type 'sexpr'
 echo -e "$NP" > $N
-awk 'BEGIN { x = "\tParseNode = iota"; }; /^\%type <node>/ {for (i=3;i<=NF;i++) { printf "\t%s%s\n",$i,x; x="";} }' $G >> $N
+awk 'BEGIN { x = "\t= iota"; }; /^\%type <node>/ || /^\%type <sexpr>/ {for (i=3;i<=NF;i++) { printf "\t%s%s\n",$i,x; x="";} }' $G >> $N
 echo -e "\n)" >> $N
 
 echo -e "\n$NN" >> $N

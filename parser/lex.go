@@ -1,13 +1,9 @@
 package parser
 
 import (	"log"
-		"bufio"
-		"os"
-		"io"
 		"unicode"
 		"unicode/utf8"
 		"strings"
-		"github.com/davecgh/go-spew/spew"
 )
 
 const eof = 0
