@@ -32,6 +32,8 @@ type pnode struct {
 	dat  Datum
 }
 
+var p ParseTree
+
 // Datum interface
 // Need to add some methods here
 // but leave it blank for the time being
@@ -196,8 +198,9 @@ func (t pnode) walkParseTree() {
 
 // Parse an SQL statement
 
-func (p ParseTree) Parse(s string) {
-
+func (pt ParseTree) Parse(s string) {
+	log.Printf("parsetree: string is %s", s)
 	exprParse(&exprLex{line: string(s)})
+	pt = p
 
 }

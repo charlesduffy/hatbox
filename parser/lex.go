@@ -9,7 +9,7 @@ import (
 
 const eof = 0
 
-var p ParseTree
+//var p ParseTree
 
 // The parser uses the type <prefix>Lex as a lexer.  It must provide
 // the methods Lex(*<prefix>SymType) int and Error(string).

@@ -1,5 +1,6 @@
 package main
 
+//go:generate rm -f parser/y.go
 //go:generate goyacc -o parser/y.go -p expr parser/gram.y
 //go:generate build/mkstructures.sh
 
@@ -11,10 +12,10 @@ import (	"log"
 		"github.com/hatbox/parser" 
 )
 
-var p parser.ParseTree
 
 func main(){
         in := bufio.NewReader(os.Stdin)
+	var ptree parser.ParseTree
         for {
                 if _, err := os.Stdout.WriteString("> "); err != nil {
                         log.Fatalf("WriteString: %s", err)
@@ -28,18 +29,18 @@ func main(){
                 }
 
                 //exprParse(&exprLex{line: string(line)})
-		p.Parse(string(line))
+		ptree.Parse(string(line))
 
-		log.Printf("Parse tree is: %+v", p)
+		log.Printf("Parse tree is: %+v", ptree)
 		log.Printf("ok, calling walkParseTree")
 	//	p.tree[0].walkParseTree()
 	//	log.Printf("==========================")
 		log.Printf("visualise with Spew:")
-		spew.Dump(p)
+		spew.Dump(ptree)
 		log.Printf("ok, calling get_rangetable")
 	//	p.tree[0].getRangeTable()
 	//	dg := p.tree[0].mkdot()
-		log.Printf("====================================================================")
+		log.Printf("BEEEEF====================================================================")
 	//	dg.drawdot()
         }
 }
