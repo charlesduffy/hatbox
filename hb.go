@@ -11,7 +11,8 @@ import (	"log"
 		"github.com/hatbox/parser"
 )
 
-var Parsetree ptree
+var p ParseTree
+
 func main(){
         in := bufio.NewReader(os.Stdin)
         for {
@@ -28,15 +29,15 @@ func main(){
 
                 exprParse(&exprLex{line: string(line)})
 
-		log.Printf("Parse tree is: %+v", Parsetree)
+		log.Printf("Parse tree is: %+v", p)
 		log.Printf("ok, calling walkParseTree")
-		Parsetree.tree[0].walkParseTree()
+		p.tree[0].walkParseTree()
 		log.Printf("==========================")
 		log.Printf("visualise with Spew:")
-		spew.Dump(Parsetree)
+		spew.Dump(p)
 		log.Printf("ok, calling get_rangetable")
-		Parsetree.tree[0].getRangeTable()
-		dg := Parsetree.tree[0].mkdot()
+		p.tree[0].getRangeTable()
+		dg := p.tree[0].mkdot()
 		log.Printf("====================================================================")
 		dg.drawdot()
         }
