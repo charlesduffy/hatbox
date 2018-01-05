@@ -1,32 +1,30 @@
 package parser
 
-import (	"log"
-		"unicode"
-		"unicode/utf8"
-		"strings"
+import (
+	"log"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 const eof = 0
 
-// Global parse tree. There's got to be 
-// a better way. 
-var Parsetree ptree
+var p ParseTree
 
 // The parser uses the type <prefix>Lex as a lexer.  It must provide
 // the methods Lex(*<prefix>SymType) int and Error(string).
 type exprLex struct {
-        line		string                  //Buffer containing SQL input text to be lexed
-	tok		int			//start of current token
-	pos		int			//current character position in input
-	typ		int			//current token type
-	width		int			//width of rune
+	line  string //Buffer containing SQL input text to be lexed
+	tok   int    //start of current token
+	pos   int    //current character position in input
+	typ   int    //current token type
+	width int    //width of rune
 }
 
-// This interface is for the token value 
-// inside yylval. 
+// This interface is for the token value
+// inside yylval.
 
 type datumval interface {
-
 }
 
 // Eventually we will define methods on the Datum
@@ -34,9 +32,9 @@ type datumval interface {
 // to internal types.
 
 func (x *exprLex) peek() rune {
-        if len(x.line) < 1 {
-                return 0
-        }
+	if len(x.line) < 1 {
+		return 0
+	}
 	r, _ := utf8.DecodeRuneInString(x.line[x.pos:])
 	return r
 }
@@ -47,63 +45,63 @@ func (x *exprLex) consume() {
 	x.shift()
 }
 
-// We're inside double quotes. 
+// We're inside double quotes.
 // Lex an identifier
 func (x *exprLex) lexdquote() {
 
-/*
+	/*
 	* consume input
 	* permit any character including spaces
 	* peek when quote encountered, to see if
 	* escaped quote or end of token
-*/
+	 */
 	x.typ = IDENTIFIER
 
 	for {
-	  n := x.next()
-	  if n == '"' {
-	    if x.peek() != '"' {
-	      return
-	    }
-	  }
-	  //TODO consider inserting a check for max identifier length
+		n := x.next()
+		if n == '"' {
+			if x.peek() != '"' {
+				return
+			}
+		}
+		//TODO consider inserting a check for max identifier length
 	}
 }
 
-// We're inside single quotes. 
+// We're inside single quotes.
 // Lex a string literal
 func (x *exprLex) lexsquote() {
 
 	x.typ = STRING_LIT
 
 	for {
-	  n := x.next()
-	  if n == '\'' {
-	    if x.peek() != '\'' {
-	      return
-	    }
-	  }
+		n := x.next()
+		if n == '\'' {
+			if x.peek() != '\'' {
+				return
+			}
+		}
 	}
 }
 
-// We've hit what looks like the 
-// start of a number. 
-// Try to lex a numeric literal 
+// We've hit what looks like the
+// start of a number.
+// Try to lex a numeric literal
 func (x *exprLex) lexnumber() {
 	x.typ = NUM_LIT
 
 	for {
-	  n := x.next()
-	  if unicode.IsDigit(n) != true && n != '.' {
-	  //here we have encountered a rune that is not
-	  //accepted within a numeric token. 
-	    if  isOperChar(n) || n == ';'|| isWhitespace(n) {
-	     return
-	    } else {
-	    x.Error(x.line)
-	    return
-	    }
-	  }
+		n := x.next()
+		if unicode.IsDigit(n) != true && n != '.' {
+			//here we have encountered a rune that is not
+			//accepted within a numeric token.
+			if isOperChar(n) || n == ';' || isWhitespace(n) {
+				return
+			} else {
+				x.Error(x.line)
+				return
+			}
+		}
 	}
 
 }
@@ -112,31 +110,31 @@ func (x *exprLex) lexnumber() {
 // or a keyword
 func (x *exprLex) lextext() {
 
-// consume characters until
-// we encounter one not in the accepted
-// set for a keyword or an identifier.
-// The accepted set is:
-// a-zA-Z0-9_
+	// consume characters until
+	// we encounter one not in the accepted
+	// set for a keyword or an identifier.
+	// The accepted set is:
+	// a-zA-Z0-9_
 
-// TODO: Modify to handle the case where identifiers
-//       may only begin with a particular set of 
-//       characters
+	// TODO: Modify to handle the case where identifiers
+	//       may only begin with a particular set of
+	//       characters
 
 	for {
-	  n := x.next()
-	  if ! isAlphaNumeric(n) {
-	  //here we have encountered the end of the token. 
-	  //determine if it is a keyword.
-	    o := x.emit()
+		n := x.next()
+		if !isAlphaNumeric(n) {
+			//here we have encountered the end of the token.
+			//determine if it is a keyword.
+			o := x.emit()
 
-	    if l, ok := SQLkeys[strings.ToLower(o)]; ok {
-	      x.typ = l
-	    } else {
-		x.typ = IDENTIFIER
-		log.Printf("lexer: IDENTIFIER: %s", o)
-	   }
-	    return
-	  }
+			if l, ok := SQLkeys[strings.ToLower(o)]; ok {
+				x.typ = l
+			} else {
+				x.typ = IDENTIFIER
+				log.Printf("lexer: IDENTIFIER: %s", o)
+			}
+			return
+		}
 	}
 }
 
@@ -145,42 +143,42 @@ func (x *exprLex) lextext() {
 // + - * / % ! = > <
 //
 // multi-char opers
-// 
-// >= <= != <> 
+//
+// >= <= != <>
 
 func (x *exprLex) lexoper() {
 
 	for {
 		n := x.next()
-		if ! isOperChar(n) {
+		if !isOperChar(n) {
 
 			o := x.emit()
 
-			switch(o) {
-				case "+":
-					x.typ = ADD
-				case "-":
-					x.typ = SUB
-				case "*":
-					x.typ = MUL
-				case "/":
-					x.typ = DIV
-				case "%":
-					x.typ = MOD
-				case "=":
-					x.typ = EQ
-				case ">":
-					x.typ = GT
-				case "<":
-					x.typ = LT
-				case ">=":
-					x.typ = GE
-				case "<=":
-					x.typ = LE
-				case "!=":
-					x.typ = NE
-				case "<>":
-					x.typ = NE
+			switch o {
+			case "+":
+				x.typ = ADD
+			case "-":
+				x.typ = SUB
+			case "*":
+				x.typ = MUL
+			case "/":
+				x.typ = DIV
+			case "%":
+				x.typ = MOD
+			case "=":
+				x.typ = EQ
+			case ">":
+				x.typ = GT
+			case "<":
+				x.typ = LT
+			case ">=":
+				x.typ = GE
+			case "<=":
+				x.typ = LE
+			case "!=":
+				x.typ = NE
+			case "<>":
+				x.typ = NE
 			}
 			log.Printf("lexer: OPER lval: %s toktyp: %d", o, x.typ)
 			return
@@ -188,9 +186,8 @@ func (x *exprLex) lexoper() {
 	}
 }
 
-
-// Lex a point character. In this context it 
-// will be a delimiter between table / column 
+// Lex a point character. In this context it
+// will be a delimiter between table / column
 // identifiers
 func (x *exprLex) lexpoint() {
 	x.typ = POINT
@@ -198,15 +195,14 @@ func (x *exprLex) lexpoint() {
 	return
 }
 
-// Lex a comma. Delimiter between 
+// Lex a comma. Delimiter between
 // select list items or table expression
 // items.
 func (x *exprLex) lexcomma() {
-	x.typ =  COMMA
+	x.typ = COMMA
 	x.consume()
 	return
 }
-
 
 func (x *exprLex) lexterm() {
 	x.typ = SEMICOLON
@@ -218,7 +214,7 @@ func (x *exprLex) lexterm() {
 //get the 'current' token
 func (x *exprLex) gettok() (rune, int) {
 
-	if (x.tok == x.pos && x.pos == len(x.line) - 1) {
+	if x.tok == x.pos && x.pos == len(x.line)-1 {
 		//end of the line
 		return eof, 0
 	}
@@ -227,23 +223,23 @@ func (x *exprLex) gettok() (rune, int) {
 	if w == 0 {
 		return eof, 0
 	} else {
-	return r,w
+		return r, w
 	}
 
 }
 
 //func curr
 //wrapper around get current
-func (x *exprLex) curr() (rune) {
-	r,w := x.gettok()
+func (x *exprLex) curr() rune {
+	r, w := x.gettok()
 	x.width = w
 	return r
 }
 
 // Return the next rune for the lexer.
-func (x *exprLex) next() (rune) {
+func (x *exprLex) next() rune {
 	x.pos = x.pos + x.width
-	r,w := x.gettok()
+	r, w := x.gettok()
 	x.width = w
 	return r
 }
@@ -262,15 +258,15 @@ func (x *exprLex) ptok() {
 		i++
 	}
 	log.Printf("line          |%s|", x.line)
-	log.Printf("tok[%2.2d]       |%s^",x.tok, tokspace)
-	log.Printf("pos[%2.2d]       |%s^",x.pos, posspace)
+	log.Printf("tok[%2.2d]       |%s^", x.tok, tokspace)
+	log.Printf("pos[%2.2d]       |%s^", x.pos, posspace)
 
 }
 
 // Return the current token
 func (x *exprLex) emit() string {
 
-	if (x.pos >= len(x.line)) {
+	if x.pos >= len(x.line) {
 		return ""
 	}
 	r := x.line[x.tok:x.pos]
@@ -284,37 +280,37 @@ func (x *exprLex) shift() {
 
 // The parser calls this method to get each new token.
 func (x *exprLex) Lex(yylval *exprSymType) int {
-	//This is called either at the very beginning of the 
-	//string to be parsed or at the start of a new 
+	//This is called either at the very beginning of the
+	//string to be parsed or at the start of a new
 	//token
-	L:
+L:
 	n := x.curr()
 
 	switch {
-	  case n == '\n':
+	case n == '\n':
 		return eof
-	  case n == eof:
+	case n == eof:
 		return eof
-	  case n == ' ' || n == '\n':
+	case n == ' ' || n == '\n':
 		x.consume()
 		goto L
-	  case n == '"':
+	case n == '"':
 		x.lexdquote()
-	  case n == '\'':
+	case n == '\'':
 		x.lexsquote()
-	  case n >= '0' && n <= '9':
+	case n >= '0' && n <= '9':
 		x.lexnumber()
-	  case n == '.':
+	case n == '.':
 		x.lexpoint()
-	  case n == ';':
+	case n == ';':
 		x.lexterm()
-	  case n == ',':
+	case n == ',':
 		x.lexcomma()
-	  case isOperChar(n):
+	case isOperChar(n):
 		//Lex a symbolic operator character
 		x.lexoper()
-	  case n == '_' || unicode.IsLetter(n):
-		//Here we could match an identifier or a 
+	case n == '_' || unicode.IsLetter(n):
+		//Here we could match an identifier or a
 		//keyword
 		//could be sensitive to order in switch stmt
 		x.lextext()
@@ -329,31 +325,30 @@ func (x *exprLex) Lex(yylval *exprSymType) int {
 }
 
 func isAlphaNumeric(r rune) bool {
-   return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
+	return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
 }
 
 func isWhitespace(r rune) bool {
-   wschars := " \t\n" //TODO add tabs, newlines
+	wschars := " \t\n" //TODO add tabs, newlines
 
-   if strings.IndexRune(wschars, r) == -1 {
-     return false
-   } else {
-     return true
-   }
+	if strings.IndexRune(wschars, r) == -1 {
+		return false
+	} else {
+		return true
+	}
 }
 
 func isOperChar(r rune) bool {
-   operchars := "+-/*%!=^~><"
+	operchars := "+-/*%!=^~><"
 
-   if strings.IndexRune(operchars, r) == -1 {
-     return false
-   } else {
-     return true
-   }
+	if strings.IndexRune(operchars, r) == -1 {
+		return false
+	} else {
+		return true
+	}
 }
 
 // The parser calls this method on a parse error.
 func (x *exprLex) Error(s string) {
-        log.Printf("parse error: %s", s)
+	log.Printf("parse error: %s", s)
 }
-

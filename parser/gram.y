@@ -9,8 +9,8 @@ import "log"
 %union 
 {
 	tokval		datumval
-	node		Pnode
-	sexpr		Pnode
+	node		pnode
+	sexpr		pnode
 	datum		Datum
 }
 
@@ -108,7 +108,7 @@ sql:
     query_statement SEMICOLON
     {
 	// Assign query_statement to the first parse node in ParseTree
-	Parsetree.tree = append(Parsetree.tree,$1)	
+	p.tree = append(p.tree,$1)	
     }
     |
     sql query_statement SEMICOLON

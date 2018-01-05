@@ -8,10 +8,10 @@ import (	"log"
 		"os"
 		"io"
 		"github.com/davecgh/go-spew/spew"
-		"github.com/hatbox/parser"
+		"github.com/hatbox/parser" 
 )
 
-var p ParseTree
+var p parser.ParseTree
 
 func main(){
         in := bufio.NewReader(os.Stdin)
@@ -27,18 +27,19 @@ func main(){
                         log.Fatalf("ReadBytes: %s", err)
                 }
 
-                exprParse(&exprLex{line: string(line)})
+                //exprParse(&exprLex{line: string(line)})
+		p.Parse(string(line))
 
 		log.Printf("Parse tree is: %+v", p)
 		log.Printf("ok, calling walkParseTree")
-		p.tree[0].walkParseTree()
-		log.Printf("==========================")
+	//	p.tree[0].walkParseTree()
+	//	log.Printf("==========================")
 		log.Printf("visualise with Spew:")
 		spew.Dump(p)
 		log.Printf("ok, calling get_rangetable")
-		p.tree[0].getRangeTable()
-		dg := p.tree[0].mkdot()
+	//	p.tree[0].getRangeTable()
+	//	dg := p.tree[0].mkdot()
 		log.Printf("====================================================================")
-		dg.drawdot()
+	//	dg.drawdot()
         }
 }
