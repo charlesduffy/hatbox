@@ -3,7 +3,7 @@
 package parser
 
 import "log"
-import "github.com/davecgh/go-spew/spew"
+//import "github.com/davecgh/go-spew/spew"
 %}
 
 %union 
@@ -108,13 +108,13 @@ sql:
     query_statement SEMICOLON
     {
 	// Assign query_statement to the first parse node in ParseTree
-	p.tree = append(p.tree,$1)	
-	spew.Dump(p)
+	P.tree = append(P.tree,$1)	
+//	spew.Dump(p)
     }
     |
     sql query_statement SEMICOLON
     {
-	p.tree = append(p.tree,$2)	
+	P.tree = append(P.tree,$2)	
 	log.Printf("PARSER: sql query_statement SEMICOLON")
     }
 ;

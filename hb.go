@@ -41,6 +41,7 @@ func main(){
 	//	p.tree[0].getRangeTable()
 	//	dg := p.tree[0].mkdot()
 		log.Printf("BEEEEF====================================================================")
+	spew.Dump(parser.P)
 	//	dg.drawdot()
         }
 }

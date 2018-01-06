@@ -1,6 +1,7 @@
 package parser
 
 import "log"
+//import "github.com/davecgh/go-spew/spew"
 
 //Parse tree node types enumeration
 //TODO: figure out a way to encapsualte this in
@@ -32,7 +33,7 @@ type pnode struct {
 	dat  Datum
 }
 
-var p ParseTree
+var P ParseTree
 
 // Datum interface
 // Need to add some methods here
@@ -198,9 +199,8 @@ func (t pnode) walkParseTree() {
 
 // Parse an SQL statement
 
-func (pt ParseTree) Parse(s string) {
+func (pt *ParseTree) Parse(s string) {
 	log.Printf("parsetree: string is %s", s)
 	exprParse(&exprLex{line: string(s)})
-	pt = p
-
+	pt.query = "hello i am spiderman"
 }
