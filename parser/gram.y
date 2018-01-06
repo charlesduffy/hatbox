@@ -117,6 +117,11 @@ sql:
 	P.tree = append(P.tree,$2)	
 	log.Printf("PARSER: sql query_statement SEMICOLON")
     }
+    |
+    error
+    {
+	log.Printf("parser error: you messed up")
+    }
 ;
 
 query_statement:
