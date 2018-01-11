@@ -4,6 +4,9 @@ package parser
 
 import "log"
 //import "github.com/davecgh/go-spew/spew"
+
+
+
 %}
 
 %union 
@@ -14,19 +17,7 @@ import "log"
 	datum		Datum
 }
 
-/*
-
-%code{
-
-  void yyerror (YYLTYPE *l, yyscan_t scanner, tuple *mqry, char const *s) {
-       //mqry->errFlag = 1;
-       fprintf (stderr, "ERROR: %s -- %d %d %d %d \n", s, l->first_line, l->first_column, l->last_line, l->last_column);  
-  }
-
-}
-
-*/
-
+//%error sql error : "error select_statement"
 
 /* note there is no type 'keyword' in the yylval struct
 
@@ -116,11 +107,6 @@ sql:
     {
 	P.tree = append(P.tree,$2)	
 	log.Printf("PARSER: sql query_statement SEMICOLON")
-    }
-    |
-    error
-    {
-	log.Printf("parser error: you messed up")
     }
 ;
 
