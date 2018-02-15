@@ -9,7 +9,8 @@ import (	"log"
 		"os"
 		"io"
 		"github.com/davecgh/go-spew/spew"
-		"github.com/hatbox/parser" 
+		"github.com/hatbox/parser"
+		//"github.com/hatbox/planner"
 )
 
 
@@ -37,11 +38,14 @@ func main(){
 	//	log.Printf("==========================")
 		log.Printf("visualise with Spew:")
 		spew.Dump(ptree)
-		log.Printf("ok, calling get_rangetable")
+		log.Printf("ok, dumping P")
+		spew.Dump(parser.P)
+//		log.Printf("ok, calling get_rangetable")
 	//	p.tree[0].getRangeTable()
 	//	dg := p.tree[0].mkdot()
 		log.Printf("BEEEEF====================================================================")
-	spew.Dump(parser.P)
+//	spew.Dump(parser.P)
+		//P.planner.PlanQuery()
 	//	dg.drawdot()
         }
 }

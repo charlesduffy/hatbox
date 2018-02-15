@@ -1,7 +1,7 @@
 package planner
 //import "fmt"
 //import "log"
-import "github.com/hatbox/parser"
+
 // Datum name. Usually something like "table"."column"
 // but can be aliased at various stages of execution. 
 
@@ -13,11 +13,11 @@ import "github.com/hatbox/parser"
 // Tuple struct used to represent a database tuple
 // internally just about everywhere, including as the 
 // basic item transmitted 
-type Tuple struct {
-	data	[]Datum
-	dtypes	[]datumtype
+//type Tuple struct {
+//	data	[]Datum
+//	dtypes	[]datumtype
 //	dnames  []datumname
-	width	int
-}
+//	width	int
+//}
 
 

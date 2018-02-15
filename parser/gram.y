@@ -107,14 +107,19 @@ import "log"
 sql:
     query_statement SEMICOLON
     {
+	// Consider deallocating / deleting any existing parse tree here
+
+
 	// Assign query_statement to the first parse node in ParseTree
-	P.tree = append(P.tree,$1)	
+	//P.tree = append(P.tree,$1)	
+	P.appendNode($1)
 //	spew.Dump(p)
     }
     |
     sql query_statement SEMICOLON
     {
-	P.tree = append(P.tree,$2)	
+	P.appendNode($2)
+	//P.tree = append(P.tree,$2)	
 	log.Printf("PARSER: sql query_statement SEMICOLON")
     }
 ;

@@ -137,12 +137,15 @@ func (t pnode) getIdentAlias() string {
 	}
 }
 
+
+
 //Gets the list of tables that we need to scan from.
 //Produces a table with relation catalogue name , schema name ,
 //relation name , alias , projection list
-func (pt ParseTree) getRangeTable() {
-
-}
+//func (pt ParseTree) getRangeTable() RangeTable {
+//	t := pt.tree
+//	return t[0].getRangeTable()
+//}//
 
 
 func (t pnode) getRangeTable() RangeTable {
