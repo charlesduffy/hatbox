@@ -1,4 +1,4 @@
-package main
+package parser
 import "fmt"
 
 //visualise a ptree using DOT
@@ -61,7 +61,7 @@ func (d dotGraph) drawdot() {
 //trickery or a wrapper function
 
 
-func (e Pnode) mkdot() (dotGraph) {
+func (e pnode) Mkdot() (dotGraph) {
 
 	var dn  []dotNode
 	var dt  []int
@@ -71,7 +71,7 @@ func (e Pnode) mkdot() (dotGraph) {
 	var depth int
 	var pid int
 
-	var f = func(e Pnode, d int)(bool, Pnode) {
+	var f = func(e pnode, d int)(bool, pnode) {
 
 		switch {
 			case d == 0:
@@ -112,7 +112,7 @@ func (e Pnode) mkdot() (dotGraph) {
 		nodeid += 1
 		linkid += 1
 
-		return false, Pnode{}
+		return false, pnode{}
 	}
 
 	e.walkPnode(f,0)

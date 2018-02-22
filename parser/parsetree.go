@@ -2,8 +2,8 @@ package parser
 
 import "log"
 
-var P ParseTree
-// Parse tree "wrapper" struct
+var P pnode
+// Parse tree interface
 type ParseTree interface {
 	Parse(string)
 	GetRangeTable() RangeTable

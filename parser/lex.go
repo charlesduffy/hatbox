@@ -45,6 +45,12 @@ func (x *exprLex) consume() {
 	x.shift()
 }
 
+// Push this character back on the stack
+func (x *exprLex) push() {
+	x.pos -= x.width
+	//x.shift()
+}
+
 // We're inside double quotes.
 // Lex an identifier
 func (x *exprLex) lexdquote() {
@@ -132,6 +138,13 @@ func (x *exprLex) lextext() {
 			} else {
 				x.typ = IDENTIFIER
 				log.Printf("lexer: IDENTIFIER: %s", o)
+				log.Printf("lexer: same IDENTIFIER trailing char: %c width: %d ", n, x.width)
+				if (!isWhitespace(n)) {
+					//log.Printf("lexer: output of curr before push is: %c", x.curr())
+					//x.push()
+					//log.Printf("lexer: pushed back non-whitespace trailing character")
+					//log.Printf("lexer: output of curr after  push is: %c", x.curr())
+				}
 			}
 			return
 		}
@@ -286,6 +299,7 @@ func (x *exprLex) Lex(yylval *exprSymType) int {
 L:
 	n := x.curr()
 
+		log.Printf("lexer: found charecter >> %c <<", n)
 	switch {
 	case n == '\n':
 		return eof
@@ -317,7 +331,8 @@ L:
 	}
 
 	yylval.tokval = x.emit()
-	x.shift()
+	log.Printf("Lexer:XX next char in string is: %c", x.curr())
+	//x.shift()
 
 	log.Printf("Lexer: Token text is: %v token type is: %d", yylval.tokval, x.typ)
 

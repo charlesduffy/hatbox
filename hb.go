@@ -5,9 +5,9 @@ package main
 //go:generate build/mkstructures.sh
 
 import (	"log"
-		"bufio"
-		"os"
-		"io"
+//		"bufio"
+//		"os"
+		//"io"
 		"github.com/davecgh/go-spew/spew"
 		"github.com/hatbox/parser"
 		//"github.com/hatbox/planner"
@@ -15,9 +15,11 @@ import (	"log"
 
 
 func main(){
-        in := bufio.NewReader(os.Stdin)
-	var ptree parser.ParseTree
-        for {
+        //in := bufio.NewReader(os.Stdin)
+	//var ptree parser.ParseTree
+
+/*
+
                 if _, err := os.Stdout.WriteString("> "); err != nil {
                         log.Fatalf("WriteString: %s", err)
                 }
@@ -28,16 +30,14 @@ func main(){
                 if err != nil {
                         log.Fatalf("ReadBytes: %s", err)
                 }
-
+*/
                 //exprParse(&exprLex{line: string(line)})
-		ptree.Parse(string(line))
+		parser.P.Parse(string("select foo from bar;"))
 
-		log.Printf("Parse tree is: %+v", ptree)
+		log.Printf("Parse tree is: %+v", parser.P)
 		log.Printf("ok, calling walkParseTree")
 	//	p.tree[0].walkParseTree()
 	//	log.Printf("==========================")
-		log.Printf("visualise with Spew:")
-		spew.Dump(ptree)
 		log.Printf("ok, dumping P")
 		spew.Dump(parser.P)
 //		log.Printf("ok, calling get_rangetable")
@@ -46,6 +46,5 @@ func main(){
 		log.Printf("BEEEEF====================================================================")
 //	spew.Dump(parser.P)
 		//P.planner.PlanQuery()
-	//	dg.drawdot()
-        }
+		parser.P.Mkdot()
 }

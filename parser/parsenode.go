@@ -88,7 +88,7 @@ func makeScalarExpr(d Datum, l pnode, r pnode) pnode {
 type PUserFunc func(pnode, int) (bool, pnode)
 
 func (t pnode) walkPnode(fn PUserFunc, depth int) (bool, pnode) {
-
+log.Printf("walking...depth is: %d", depth)
 	//traverse 'tree' slice left-depth first
 
 	var p pnode
