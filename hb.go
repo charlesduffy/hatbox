@@ -46,5 +46,6 @@ func main(){
 		log.Printf("BEEEEF====================================================================")
 //	spew.Dump(parser.P)
 		//P.planner.PlanQuery()
-		parser.P.Mkdot()
+		dd := parser.P.Mkdot()
+		dd.Drawdot()
 }

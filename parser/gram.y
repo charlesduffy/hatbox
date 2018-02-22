@@ -78,7 +78,7 @@ import "github.com/davecgh/go-spew/spew"
 
 %start sql
 /* The integer value of the tok names start from zero (with query_statement)  */
-%type <node>	query_statement select_statement select_list u_select_list_item select_list_item table_ref
+%type <node>	sql query_statement select_statement select_list u_select_list_item select_list_item table_ref
 %type <node>	table_ref_list table_expr
 %type <node>	function case_expr case_expr_when_list case_expr_when from_clause 
 %type <node>	order_by_list order_by_list_item order_by_clause

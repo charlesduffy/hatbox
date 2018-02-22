@@ -21,7 +21,7 @@ type dotGraph struct {
 	dl	[]dotLink
 }
 
-func (d dotGraph) drawdot() {
+func (d dotGraph) Drawdot() {
 
 	var attstr string
 

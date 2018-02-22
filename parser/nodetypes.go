@@ -1,7 +1,8 @@
 package parser
 const (
 
-	query_statement	= iota
+	sql	= iota
+	query_statement
 	select_statement
 	select_list
 	u_select_list_item
@@ -33,6 +34,7 @@ const (
 
 var NodeYNames = []string{
 
+	"sql",
 	"query_statement",
 	"select_statement",
 	"select_list",
@@ -59,5 +61,6 @@ var NodeYNames = []string{
 	"create_table_stmt",
 	"drop_table_stmt",
 	"in_predicate",
+	"scalar_expr",
 
 }
