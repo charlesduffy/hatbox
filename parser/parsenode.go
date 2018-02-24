@@ -18,6 +18,11 @@ const (
 	att_subq		// Is a subquery (bool)
 )
 
+// When a yacc rule is empty
+// (such as when an optional clause like WHERE
+//  is not present in a table expression) we
+// set the tag field of pnode to _empty, which is -1
+const _empty = -1
 
 // Parse tree node struct, "Pnode"
 // Each node is an element of the AST 
@@ -146,47 +151,6 @@ func (t pnode) getIdentAlias() string {
 	} else {
 		return ""
 	}
-}
-
-//Gets the "range table" - a list of tables that we need to scan from.
-//Produces a table with relation catalogue name , schema name ,
-//relation name , alias , projection list
-func (t pnode) GetRangeTable() RangeTable {
-
-	var rt RangeTable
-	var planid int
-
-	planid = 0
-
-	var f = func(l pnode, _ int) (bool, pnode) {
-
-		if l.tag == table_ref {
-			rt = append(rt, TRange{
-				catId:      0,
-				planId:     planid,
-				physName:   l.getIdent(),
-				relName:    l.getIdent(),
-				schemaName: "public",
-				aliasName:  l.getIdentAlias()})
-			planid += 1
-		}
-		return false, pnode{}
-	}
-
-	t.walkPnode(f, 0)
-
-	log.Printf("range table is: %+v", rt)
-	return rt
-}
-
-func (t pnode) getSelection() SelectionTable {
-
-	return nil
-}
-
-func (t pnode) getProjection() ProjectionTable {
-
-	return nil
 }
 
 // Walk parse tree for debugging purposes

@@ -1,5 +1,6 @@
 package parser
 
+import "log"
 // Range Table
 // A list of structs identifying relations in a query
 // Just an array of TRange objects (range is a keyword)
@@ -44,3 +45,43 @@ type TProjection struct {
 type ProjectionTable []TProjection
 
 
+//Gets the "range table" - a list of tables that we need to scan from.
+//Produces a table with relation catalogue name , schema name ,
+//relation name , alias , projection list
+func (t pnode) GetRangeTable() RangeTable {
+
+	var rt RangeTable
+	var planid int
+
+	planid = 0
+
+	var f = func(l pnode, _ int) (bool, pnode) {
+
+		if l.tag == table_ref {
+			rt = append(rt, TRange{
+				catId:      0,
+				planId:     planid,
+				physName:   l.getIdent(),
+				relName:    l.getIdent(),
+				schemaName: "public",
+				aliasName:  l.getIdentAlias()})
+			planid += 1
+		}
+		return false, pnode{}
+	}
+
+	t.walkPnode(f, 0)
+
+	log.Printf("range table is: %+v", rt)
+	return rt
+}
+
+func (t pnode) GetSelection() SelectionTable {
+
+	return nil
+}
+
+func (t pnode) GetProjection() ProjectionTable {
+
+	return nil
+}

@@ -65,14 +65,14 @@ import "log"
 %start sql
 /* The integer value of the tok names start from zero (with query_statement)  */
 %type <node>	sql query_statement select_statement select_list u_select_list_item select_list_item table_ref
-%type <node>	table_ref_list table_expr
+%type <node>	table_ref_list table_expr where_clause
 %type <node>	function case_expr case_expr_when_list case_expr_when from_clause 
 %type <node>	order_by_list order_by_list_item order_by_clause
 %type <node>	column_definition column_definition_list data_type insert_statement insert_value_list column_list
 %type <node>	ddl_table_ref create_table_stmt drop_table_stmt in_predicate
 
 /* These emit expr structures. Review this */
-%type <tokval>	group_by_clause having_clause where_clause 
+%type <tokval>	group_by_clause having_clause 
 %type <sexpr> 	scalar_expr 
 
 %type <datum>	value_expr colref
@@ -285,14 +285,14 @@ from_clause:
 where_clause:
     empty
     {
-	$$ = nil;
+	$$ = makeNode(_empty)
     }
     |
     WHERE scalar_expr
     {
 	log.Printf("PARSER: found WHERE scalar_expr")
 	$$ = makeNode(where_clause)
-	$$=$2;
+	$$.appendNode($2)
     }
 ;
 
@@ -392,10 +392,9 @@ table_expr:
     {
 	$$ = makeNode(table_expr)
 	$$.appendNode($1)
-	log.Printf("PARSER: table_expr: where_clause is: %v", $2)
-	if ($2 == nil) {
-		log.Printf("PARSER: there's no where clause!")
-	}
+	if $2.tag == _empty {
+		log.Printf("PARSER: table_expr: where clause is empty")
+	}	
     }
 ;
 

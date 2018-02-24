@@ -10,6 +10,7 @@ const (
 	table_ref
 	table_ref_list
 	table_expr
+	where_clause
 	function
 	case_expr
 	case_expr_when_list
@@ -28,6 +29,8 @@ const (
 	create_table_stmt
 	drop_table_stmt
 	in_predicate
+	group_by_clause
+	having_clause
 	scalar_expr
 
 )
@@ -43,6 +46,7 @@ var NodeYNames = []string{
 	"table_ref",
 	"table_ref_list",
 	"table_expr",
+	"where_clause",
 	"function",
 	"case_expr",
 	"case_expr_when_list",
@@ -61,6 +65,8 @@ var NodeYNames = []string{
 	"create_table_stmt",
 	"drop_table_stmt",
 	"in_predicate",
+	"group_by_clause",
+	"having_clause",
 	"scalar_expr",
 
 }

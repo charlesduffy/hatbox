@@ -8,7 +8,7 @@ import (	"log"
 //		"bufio"
 //		"os"
 		//"io"
-		"github.com/davecgh/go-spew/spew"
+//		"github.com/davecgh/go-spew/spew"
 		"github.com/hatbox/parser"
 		//"github.com/hatbox/planner"
 )
@@ -32,14 +32,14 @@ func main(){
                 }
 */
                 //exprParse(&exprLex{line: string(line)})
-		parser.P.Parse(string("select foo from bar where foo < 1;"))
+		parser.P.Parse(string("select foo from bar where foo < 1; select bar from goo;"))
 
 		log.Printf("Parse tree is: %+v", parser.P)
 		log.Printf("ok, calling walkParseTree")
 	//	p.tree[0].walkParseTree()
 	//	log.Printf("==========================")
 		log.Printf("ok, dumping P")
-		spew.Dump(parser.P)
+//		spew.Dump(parser.P)
 //		log.Printf("ok, calling get_rangetable")
 	//	p.tree[0].getRangeTable()
 	//	dg := p.tree[0].mkdot()
