@@ -91,8 +91,6 @@ package parser
 sql:
     query_statement SEMICOLON
     {
-	// Consider deallocating / deleting any existing parse tree here
-
 	P.appendNode($1)
     }
     |
