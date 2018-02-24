@@ -24,5 +24,5 @@ awk 'BEGIN { x = "\t= iota"; }; /^\%type <node>/ || /^\%type <sexpr>/ {for (i=3;
 echo -e "\n)" >> $N
 
 echo -e "\n$NN" >> $N
-awk '/^\%type <node>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\",\n",$i} }' $G >> $N
+awk '/^\%type <node>/ || /^\%type <sexpr>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\",\n",$i} }' $G >> $N
 echo -e "\n}" >> $N
