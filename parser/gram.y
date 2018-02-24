@@ -2,8 +2,6 @@
 
 package parser
 
-import "log"
-import "github.com/davecgh/go-spew/spew"
 %}
 
 %union 
@@ -13,20 +11,6 @@ import "github.com/davecgh/go-spew/spew"
 	sexpr		pnode
 	datum		Datum
 }
-
-/*
-
-%code{
-
-  void yyerror (YYLTYPE *l, yyscan_t scanner, tuple *mqry, char const *s) {
-       //mqry->errFlag = 1;
-       fprintf (stderr, "ERROR: %s -- %d %d %d %d \n", s, l->first_line, l->first_column, l->last_line, l->last_column);  
-  }
-
-}
-
-*/
-
 
 /* note there is no type 'keyword' in the yylval struct
 
@@ -109,26 +93,18 @@ sql:
     {
 	// Consider deallocating / deleting any existing parse tree here
 
-
-	// Assign query_statement to the first parse node in ParseTree
-	//P.tree = append(P.tree,$1)	
 	P.appendNode($1)
-	log.Printf("parser, gram.y: in SQL node")
-	spew.Dump(P)
     }
     |
     sql query_statement SEMICOLON
     {
 	P.appendNode($2)
-	//P.tree = append(P.tree,$2)	
-	log.Printf("PARSER: sql query_statement SEMICOLON")
     }
 ;
 
 query_statement:
     select_statement 
     { 
-	log.Printf("PARSER: select_statement ")
 	$$ = makeNode(query_statement)
 	$$.appendNode($1)
     } 
@@ -428,7 +404,6 @@ EXPRESSIONS
 scalar_expr:
     value_expr
     { 
-	log.Printf("Parser: found value_expr %+v",$1)
 	$$ = makeNode(scalar_expr)
 	$$.addDatum0($1)
     }
@@ -440,7 +415,6 @@ scalar_expr:
     |
     scalar_expr ADD scalar_expr 
     {
-	log.Printf("parser: found Exp ADD Exp")
 	$$ = makeOperScalarExpr(ADD,$1,$3)
     }
     |
@@ -537,9 +511,7 @@ scalar_expr:
 value_expr:
 	colref
 	{ 
-	log.Printf("PARSER: value_expr->Found colref %+v", $1)
 	    $$=$1;
-	log.Printf("PARSER: value_expr->Found colref %+v", $$)
 	}
 	|
 	boolean
@@ -642,14 +614,10 @@ case_expr_when:
 colref:
 	IDENTIFIER 
 	{ 
-	log.Printf("Parser: I found an Identifier!!")
-	log.Printf("IDENTIFIER: node value %s", $1) 
-	log.Printf("------")
 	$$ = Datum{
 		value: $1,
 		dtype: IDENTIFIER}
 
-	log.Printf("IDENTIFIER: Datum is: %+v", $$)
 	}
 
 	|

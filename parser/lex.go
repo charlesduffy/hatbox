@@ -9,7 +9,6 @@ import (
 
 const eof = 0
 
-//var p ParseTree
 
 // The parser uses the type <prefix>Lex as a lexer.  It must provide
 // the methods Lex(*<prefix>SymType) int and Error(string).
@@ -23,14 +22,12 @@ type exprLex struct {
 
 // This interface is for the token value
 // inside yylval.
-
 type datumval interface {
 }
 
 // Eventually we will define methods on the Datum
 // interface to transform string token values
 // to internal types.
-
 func (x *exprLex) peek() rune {
 	if len(x.line) < 1 {
 		return 0
@@ -39,7 +36,8 @@ func (x *exprLex) peek() rune {
 	return r
 }
 
-// Ignore this character
+// Consume a character from the string to be lexed 
+// and discard it
 func (x *exprLex) consume() {
 	x.pos += x.width
 	x.shift()
@@ -48,19 +46,15 @@ func (x *exprLex) consume() {
 // Push this character back on the stack
 func (x *exprLex) push() {
 	x.pos -= x.width
-	//x.shift()
 }
 
-// We're inside double quotes.
-// Lex an identifier
+// Lex an IDENTIFIER
+// This function applies for the state
+// when we are inside double-quotes
+// Identifiers can consist of any character 
+// including spaces
 func (x *exprLex) lexdquote() {
 
-	/*
-	* consume input
-	* permit any character including spaces
-	* peek when quote encountered, to see if
-	* escaped quote or end of token
-	 */
 	x.typ = IDENTIFIER
 
 	for {
@@ -137,14 +131,6 @@ func (x *exprLex) lextext() {
 				x.typ = l
 			} else {
 				x.typ = IDENTIFIER
-				log.Printf("lexer: IDENTIFIER: %s", o)
-				log.Printf("lexer: same IDENTIFIER trailing char: %c width: %d ", n, x.width)
-				if (!isWhitespace(n)) {
-					//log.Printf("lexer: output of curr before push is: %c", x.curr())
-					//x.push()
-					//log.Printf("lexer: pushed back non-whitespace trailing character")
-					//log.Printf("lexer: output of curr after  push is: %c", x.curr())
-				}
 			}
 			return
 		}
@@ -193,7 +179,6 @@ func (x *exprLex) lexoper() {
 			case "<>":
 				x.typ = NE
 			}
-			log.Printf("lexer: OPER lval: %s toktyp: %d", o, x.typ)
 			return
 		}
 	}
@@ -299,7 +284,6 @@ func (x *exprLex) Lex(yylval *exprSymType) int {
 L:
 	n := x.curr()
 
-		log.Printf("lexer: found charecter >> %c <<", n)
 	switch {
 	case n == '\n':
 		return eof
@@ -331,10 +315,8 @@ L:
 	}
 
 	yylval.tokval = x.emit()
-	log.Printf("Lexer:XX next char in string is: %c", x.curr())
 	//x.shift()
 
-	log.Printf("Lexer: Token text is: %v token type is: %d", yylval.tokval, x.typ)
 
 	return x.typ
 }

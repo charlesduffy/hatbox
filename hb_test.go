@@ -16,3 +16,8 @@ func TestSQLSelect1(t *testing.T){
 		dd := parser.P.Mkdot()
 		dd.Drawdot()
 }
+
+func TestPlannerGetRangeTable(t *testing.T) {
+	      parser.P.Parse(string("select foo from bar;"))
+	      parser.P.GetRangeTable()
+}
