@@ -2,6 +2,8 @@
 
 package parser
 
+import "log"
+
 %}
 
 %union 
@@ -283,12 +285,14 @@ from_clause:
 where_clause:
     empty
     {
-//	$$=NULL;
+	$$ = nil;
     }
     |
     WHERE scalar_expr
     {
-//	$$=$2;
+	log.Printf("PARSER: found WHERE scalar_expr")
+	$$ = makeNode(where_clause)
+	$$=$2;
     }
 ;
 
@@ -388,6 +392,10 @@ table_expr:
     {
 	$$ = makeNode(table_expr)
 	$$.appendNode($1)
+	log.Printf("PARSER: table_expr: where_clause is: %v", $2)
+	if ($2 == nil) {
+		log.Printf("PARSER: there's no where clause!")
+	}
     }
 ;
 
