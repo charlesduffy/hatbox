@@ -15,5 +15,6 @@ type ParseTree interface {
 
 func (pt *pnode) Parse(s string) {
 	log.Printf("parsetree: string is %s", s)
+	P = pnode{}
 	exprParse(&exprLex{line: string(s)})
 }
