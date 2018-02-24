@@ -20,9 +20,9 @@ echo -e "\n}" >> $K
 #we get these out of the grammar file itself
 #include everything type 'node' or type 'sexpr'
 echo -e "$NP" > $N
-awk 'BEGIN { x = "\t= iota"; }; /^\%type <node>/ || /^\%type <sexpr>/ {for (i=3;i<=NF;i++) { printf "\t%s%s\n",$i,x; x="";} }' $G >> $N
+awk 'BEGIN { x = "\t= iota"; }; /^\%type <node>/ || /^\%type <sexpr>/ || /^\%type <tokval>/ {for (i=3;i<=NF;i++) { printf "\t%s%s\n",$i,x; x="";} }' $G >> $N
 echo -e "\n)" >> $N
 
 echo -e "\n$NN" >> $N
-awk '/^\%type <node>/ || /^\%type <sexpr>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\",\n",$i} }' $G >> $N
+awk '/^\%type <node>/ || /^\%type <sexpr>/ || /^\%type <tokval>/ {for (i=3;i<=NF;i++) { printf "\t\"%s\",\n",$i} }' $G >> $N
 echo -e "\n}" >> $N
