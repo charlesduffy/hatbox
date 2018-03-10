@@ -210,6 +210,12 @@ u_select_list_item:
 ;
 
 select_statement:
+    SELECT select_list 
+    {
+	$$ = makeNode(select_statement)
+	$$.appendNode($2)
+    }
+    |
     SELECT select_list table_expr
     {
 	$$ = makeNode(select_statement)

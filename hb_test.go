@@ -11,7 +11,31 @@ import (
 
 
 func TestSQLSelect1(t *testing.T){
+		parser.P.Parse(string("select foo;"))
+		dd := parser.P.Mkdot()
+		dd.Drawdot()
+}
+
+func TestSQLSelect2(t *testing.T){
 		parser.P.Parse(string("select foo from bar;"))
+		dd := parser.P.Mkdot()
+		dd.Drawdot()
+}
+
+func TestSQLSelect3(t *testing.T){
+		parser.P.Parse(string("select foo from bar where a < 1;"))
+		dd := parser.P.Mkdot()
+		dd.Drawdot()
+}
+
+func TestSQLSelect4(t *testing.T){
+		parser.P.Parse(string("select foo from bar where a < 1 and b > 2;"))
+		dd := parser.P.Mkdot()
+		dd.Drawdot()
+}
+
+func TestSQLSelect5(t *testing.T){
+		parser.P.Parse(string("select foo from bar where a < 1 and b > 2 or b = 5;"))
 		dd := parser.P.Mkdot()
 		dd.Drawdot()
 }
