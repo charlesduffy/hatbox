@@ -38,7 +38,8 @@ import "log"
 %token <keyword> QUOTE NEWLINE 
 
 /* operators */
-%token <operator> ADD SUB MUL DIV MOD EQ NE LT GT LE GE AND OR NOT IN BETWEEN
+%token <keyword> AND OR NOT IN BETWEEN
+%token <operator> ADD SUB MUL DIV MOD EQ NE LT GT LE GE 
 
 /* operator precedence */
 
@@ -392,9 +393,9 @@ table_expr:
     {
 	$$ = makeNode(table_expr)
 	$$.appendNode($1)
-	if $2.tag == _empty {
-		log.Printf("PARSER: table_expr: where clause is empty")
-	}	
+	if $2.tag != _empty {
+		$$.appendNode($2)
+	}
     }
 ;
 
@@ -440,6 +441,7 @@ scalar_expr:
     |
     scalar_expr AND scalar_expr 		
     {
+	log.Printf("parser: found AND")
 	$$ = makeOperScalarExpr(AND,$1,$3)
     }
     |

@@ -32,7 +32,7 @@ func main(){
                 }
 */
                 //exprParse(&exprLex{line: string(line)})
-		parser.P.Parse(string("select foo from bar where foo < 1; select bar from goo;"))
+		parser.P.Parse(string("select foo from bar where foo < 1 and bar > 2;"))
 
 		log.Printf("Parse tree is: %+v", parser.P)
 		log.Printf("ok, calling walkParseTree")
