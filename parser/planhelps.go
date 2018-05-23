@@ -38,6 +38,7 @@ type SelectionTable []TSelection
 // that is the "select list"
 
 type TProjection struct {
+	planId int
 	proj []pnode
 	ord  int
 }
@@ -96,13 +97,35 @@ func (t pnode) GetSelection() SelectionTable {
 
 	t.walkPnode(f, 0)
 
-	log.Printf("range table is: %+v", st)
+	log.Printf("selection table is: %+v", st)
 	return st
 
-	return nil
 }
 
 func (t pnode) GetProjection() ProjectionTable {
 
-	return nil
+	var pt ProjectionTable
+	var planid int
+	var order int
+
+	planid = 0
+	order = 0
+
+	var f = func(l pnode, _ int) (bool, pnode) {
+
+		if l.tag == select_list {
+			pt = append(pt, TProjection{
+				planId:     planid,
+				ord:	    order,
+				proj:  l.tree})
+			planid += 1
+			order += 1
+		}
+		return false, pnode{}
+	}
+
+	t.walkPnode(f, 0)
+
+	log.Printf("Projection table is: %+v", pt)
+	return pt
 }

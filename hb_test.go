@@ -50,9 +50,9 @@ func TestPlannerGetSelection(t *testing.T) {
 	      parser.P.Parse(string("select foo from bar where foo < 1;"))
 	      parser.P.GetSelection()
 }
-/*
+
 func TestPlannerGetProjection(t *testing.T) {
-	      parser.P.Parse(string("select foo from bar;"))
+	      parser.P.Parse(string("select foo from bar where foo < 1;"))
 	      parser.P.GetProjection()
 }
-*/
+
