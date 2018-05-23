@@ -26,7 +26,7 @@ type RangeTable []TRange
 
 type TSelection struct {
 	planId int   //the plan ID of the relation this filter applies to
-	selExp pnode //an expression extracted from the WHERE clause Expr
+	selExp []pnode //an expression extracted from the WHERE clause Expr
 	//which applies to just the relation referred to in
 	//planId
 }
@@ -77,6 +77,27 @@ func (t pnode) GetRangeTable() RangeTable {
 }
 
 func (t pnode) GetSelection() SelectionTable {
+
+	var st SelectionTable
+	var planid int
+
+	planid = 0
+
+	var f = func(l pnode, _ int) (bool, pnode) {
+
+		if l.tag == where_clause {
+			st = append(st, TSelection{
+				planId:     planid,
+				selExp:  l.tree})
+			planid += 1
+		}
+		return false, pnode{}
+	}
+
+	t.walkPnode(f, 0)
+
+	log.Printf("range table is: %+v", st)
+	return st
 
 	return nil
 }

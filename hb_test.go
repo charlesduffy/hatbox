@@ -9,7 +9,7 @@ import (
 		"testing"
 )
 
-
+/*
 func TestSQLSelect1(t *testing.T){
 		parser.P.Parse(string("select foo;"))
 		dd := parser.P.Mkdot()
@@ -39,19 +39,20 @@ func TestSQLSelect5(t *testing.T){
 		dd := parser.P.Mkdot()
 		dd.Drawdot()
 }
-
+*/
 func TestPlannerGetRangeTable(t *testing.T) {
-	      parser.P.Parse(string("select foo from bar;"))
+	      parser.P.Parse(string("select foo from bar, baz where A < 1 and B > 2 or C = B;"))
 	      parser.P.GetRangeTable()
 }
 
+
 func TestPlannerGetSelection(t *testing.T) {
-	      parser.P.Parse(string("select foo from bar;"))
+	      parser.P.Parse(string("select foo from bar where foo < 1;"))
 	      parser.P.GetSelection()
 }
-
+/*
 func TestPlannerGetProjection(t *testing.T) {
 	      parser.P.Parse(string("select foo from bar;"))
 	      parser.P.GetProjection()
 }
-
+*/

@@ -7,7 +7,7 @@ import "github.com/hatbox/parser"
 // we need a Plan interface object
 
 type Planable interface {
-	//ok things we want in a Plan objet are:
+	//ok things we want in a Plan object are:
 	//a way to get the Range table
 	//
 	GetRangeTable() parser.RangeTable
