@@ -1,6 +1,6 @@
 package parser
 
-import "log"
+//import "log"
 
 var P pnode
 // Parse tree interface
@@ -14,7 +14,7 @@ type ParseTree interface {
 // Parse an SQL statement
 
 func (pt *pnode) Parse(s string) {
-	log.Printf("parsetree: string is %s", s)
+	//log.Printf("parsetree: string is %s", s)
 	P = pnode{}
 	exprParse(&exprLex{line: string(s)})
 }

@@ -2,7 +2,7 @@
 
 package parser
 
-import "log"
+//import "log"
 
 %}
 
@@ -297,7 +297,7 @@ where_clause:
     |
     WHERE scalar_expr
     {
-	log.Printf("PARSER: found WHERE scalar_expr")
+//	//log.Printf("PARSER: found WHERE scalar_expr")
 	$$ = makeNode(where_clause)
 	$$.appendNode($2)
     }
@@ -447,7 +447,7 @@ scalar_expr:
     |
     scalar_expr AND scalar_expr 		
     {
-	log.Printf("parser: found AND")
+	////log.Printf("parser: found AND")
 	$$ = makeOperScalarExpr(AND,$1,$3)
     }
     |

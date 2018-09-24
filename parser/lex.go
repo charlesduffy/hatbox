@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"log"
+//	"log"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -255,9 +255,9 @@ func (x *exprLex) ptok() {
 		posspace += " "
 		i++
 	}
-	log.Printf("line          |%s|", x.line)
-	log.Printf("tok[%2.2d]       |%s^", x.tok, tokspace)
-	log.Printf("pos[%2.2d]       |%s^", x.pos, posspace)
+	//log.Printf("line          |%s|", x.line)
+	//log.Printf("tok[%2.2d]       |%s^", x.tok, tokspace)
+	//log.Printf("pos[%2.2d]       |%s^", x.pos, posspace)
 
 }
 
@@ -347,5 +347,5 @@ func isOperChar(r rune) bool {
 
 // The parser calls this method on a parse error.
 func (x *exprLex) Error(s string) {
-	log.Printf("parse error: %s", s)
+	//log.Printf("parse error: %s", s)
 }

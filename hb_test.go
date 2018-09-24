@@ -7,6 +7,7 @@ package main
 import (
 		"github.com/hatbox/parser"
 		"testing"
+		"log"
 )
 
 /*
@@ -41,18 +42,26 @@ func TestSQLSelect5(t *testing.T){
 }
 */
 func TestPlannerGetRangeTable(t *testing.T) {
-	      parser.P.Parse(string("select foo from bar, baz where A < 1 and B > 2 or C = B;"))
-	      parser.P.GetRangeTable()
+	      var rt parser.RangeTable
+	      parser.P.Parse(string("select foo from bar , baz , bing where A < 1 and B > 2 or C = B;"))
+	      rt = parser.P.GetRangeTable()
+	      log.Printf("\nrange table: %+v",rt)
 }
 
 
 func TestPlannerGetSelection(t *testing.T) {
-	      parser.P.Parse(string("select foo from bar where foo < 1;"))
-	      parser.P.GetSelection()
+	      var st parser.SelectionTable
+	      //parser.P.Parse(string("select foo from bar where foo < 1;"))
+	      parser.P.Parse(string("select foo from bar , baz , bing where A < 1 and B > 2 or C = B;"))
+	      st = parser.P.GetSelection()
+	     log.Printf("\nselection table: %+v",st)
 }
 
 func TestPlannerGetProjection(t *testing.T) {
-	      parser.P.Parse(string("select foo from bar where foo < 1;"))
-	      parser.P.GetProjection()
+		var pt parser.ProjectionTable
+	      //parser.P.Parse(string("select foo from bar where foo < 1;"))
+	      parser.P.Parse(string("select foo from bar , baz , bing where A < 1 and B > 2 or C = B;"))
+	      pt = parser.P.GetProjection()
+	      log.Printf("\nprojection table: %+v",pt)
 }
 

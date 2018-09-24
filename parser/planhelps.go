@@ -1,6 +1,6 @@
 package parser
 
-import "log"
+//import "log"
 // Range Table
 // A list of structs identifying relations in a query
 // Just an array of TRange objects (range is a keyword)
@@ -73,7 +73,7 @@ func (t pnode) GetRangeTable() RangeTable {
 
 	t.walkPnode(f, 0)
 
-	log.Printf("range table is: %+v", rt)
+	//log.Printf("range table is: %+v", rt)
 	return rt
 }
 
@@ -97,7 +97,7 @@ func (t pnode) GetSelection() SelectionTable {
 
 	t.walkPnode(f, 0)
 
-	log.Printf("selection table is: %+v", st)
+	//log.Printf("selection table is: %+v", st)
 	return st
 
 }
@@ -126,6 +126,6 @@ func (t pnode) GetProjection() ProjectionTable {
 
 	t.walkPnode(f, 0)
 
-	log.Printf("Projection table is: %+v", pt)
+	//log.Printf("Projection table is: %+v", pt)
 	return pt
 }
