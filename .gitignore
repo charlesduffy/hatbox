@@ -3,3 +3,4 @@ keywords.go
 y.go
 hatbox
 *.swp
+~$*.docx
