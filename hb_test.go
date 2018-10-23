@@ -73,7 +73,8 @@ func TestPlannerGetProjection(t *testing.T) {
 func TestPlannerVisualise(t *testing.T) {
 		//var pt parser.ProjectionTable
 	      //parser.P.Parse(string("select foo from bar where foo < 1;"))
-	      parser.P.Parse(string("select foo from bar , baz , bing where A < 1 and B > 2 or C = B;"))
+	      //parser.P.Parse(string("select foo from bar , baz , bing where A < 1 and B > 2 or C = B;"))
+	      parser.P.Parse(string("select a from foo, bar, baz where A < 1 and A = C and C = D;"))
 	      //parser.P.Parse(string("select foo from bar as b1 , baz as b2 , bing as b3 where f < 1;"))
 	      //parser.P.Parse(string("select A from tab1 where A < 1 and B = 2;"))
 	      dt := parser.P.Mkdot()
