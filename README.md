@@ -1,2 +1,3 @@
 # Hatbox
-SQL on blockchain
+SQL on hyperledger blockchain
+**totally experimental and basically unusable**
